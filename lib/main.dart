@@ -1,6 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/models/board_game.dart';
+import 'package:game_score_app/models/game_record.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:game_score_app/models/user.dart';
 
-void main() {
+void main() async {
+  // flutter初期化
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Hive初期化
+  await Hive.initFlutter();
+  // 型アダプター登録
+  Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(BoardGameAdapter());
+  Hive.registerAdapter(GameRecordAdapter());
+  Hive.registerAdapter(ScoreItemAdapter());
+  Hive.registerAdapter(PlayerScoreAdapter());
+  Hive.registerAdapter(PlayerTotalScoreAdapter());
+  // モデルをHiveで利用可能な状態にする（インデックス情報などのメモリマッピング）
+  await Hive.openBox<User>('users');
+  await Hive.openBox<BoardGame>('boardGames');
+  await Hive.openBox<GameRecord>('gameRecords');
+
   runApp(const MyApp());
 }
 
