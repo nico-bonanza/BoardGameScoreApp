@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:game_score_app/models/game_record.dart';
 import 'package:game_score_app/screens/home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:game_score_app/models/user.dart';
 
@@ -32,13 +33,24 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light(),
-      // darkTheme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(
-      //     seedColor: Colors.blue,
-      //     brightness: Brightness.dark,
-      //   ),
-      // ),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor:
+            const Color.fromARGB(255, 252, 255, 249), // やや明るめのグレー
+        textTheme: GoogleFonts.zenMaruGothicTextTheme(),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF2E2E2E), // やや明るめのグレー
+        textTheme: GoogleFonts.zenMaruGothicTextTheme(),
+      ),
+      themeMode: ThemeMode.system,
       home: const HomeScreen(),
     );
   }
