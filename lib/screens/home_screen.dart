@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: '棚',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.score),
+              icon: Icon(Icons.receipt_long),
               label: 'スコア記録',
             ),
           ]),

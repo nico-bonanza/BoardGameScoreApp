@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/tabler.dart';
 
 class BoardGameListScreen extends StatelessWidget {
   const BoardGameListScreen({super.key});
@@ -40,7 +38,7 @@ class BoardGameListScreen extends StatelessWidget {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text('UUID: ${boardGame?.id ?? '-'}'),
-                  leading: const Iconify(Tabler.meeple),
+                  leading: const Icon(Icons.pentagon),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     // 詳細とか編集とか
