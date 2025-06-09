@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/screens/board_game_list_screen.dart';
 import 'board_game_input_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ボトムナビゲータの画面配列
   final List<Widget> _screens = [
     BoardGameInputScreen(),
+    BoardGameListScreen(),
     Center(
       child: Text('他のがめん'),
     ),
@@ -34,6 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.videogame_asset),
               label: 'ゲーム登録',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shelves),
+              label: '棚',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.score),

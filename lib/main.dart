@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:game_score_app/models/game_record.dart';
 import 'package:game_score_app/screens/home_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:game_score_app/models/user.dart';
 
