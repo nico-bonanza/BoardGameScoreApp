@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/modals/board_game_input_modal.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -48,6 +49,20 @@ class BoardGameListScreen extends StatelessWidget {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // モーダル表示
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true, // キーボードで自動調整
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            builder: (context) => BoardGameInputModal(),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

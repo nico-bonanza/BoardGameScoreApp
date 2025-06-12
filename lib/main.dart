@@ -48,7 +48,9 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         scaffoldBackgroundColor: const Color(0xFF2E2E2E), // やや明るめのグレー
-        textTheme: GoogleFonts.zenMaruGothicTextTheme(),
+        textTheme: GoogleFonts.zenMaruGothicTextTheme().apply(
+          bodyColor: Colors.white, // 入力値やテキストの色
+        ),
       ),
       themeMode: ThemeMode.system,
       home: const HomeScreen(),
