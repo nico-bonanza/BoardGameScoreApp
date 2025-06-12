@@ -39,7 +39,7 @@ class UserListScreen extends StatelessWidget {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text('UUID: ${user?.id ?? '-'}'),
-                  leading: const Icon(Icons.pentagon),
+                  leading: const Icon(Icons.person),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     // 詳細とか編集とか

@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'ボドゲ棚',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.supervised_user_circle),
+              icon: Icon(Icons.people_alt),
               label: 'ユーザー',
             ),
             BottomNavigationBarItem(
