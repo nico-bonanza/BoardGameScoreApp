@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/screens/board_game_list_screen.dart';
+import 'package:game_score_app/screens/user_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ボトムナビゲータの画面配列
   final List<Widget> _screens = [
-    BoardGameListScreen(),
+    BoardGameListScreen(), // ボドゲ棚
+    UserListScreen(), // ユーザー
     Center(
       child: Text('他のがめん'),
     ),
@@ -34,6 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.shelves),
               label: 'ボドゲ棚',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.supervised_user_circle),
+              label: 'ユーザー',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long),
