@@ -3,16 +3,16 @@ import 'user.dart';
 import 'board_game.dart';
 import 'hive_type_ids.dart';
 
-part 'game_record.g.dart';
+part 'score_record.g.dart';
 
 // ゲーム記録
-@HiveType(typeId: HiveTypeIds.gameRecord)
-class GameRecord extends HiveObject{
+@HiveType(typeId: HiveTypeIds.scoreRecord)
+class ScoreRecord extends HiveObject {
   @HiveField(0)
-  String id; // UUID?title_日付？
+  String id; // UUID
 
   @HiveField(1)
-  BoardGame game; // ボードゲーム情報
+  BoardGame boardGame; // ボードゲーム情報
 
   @HiveField(2)
   DateTime createdAt; // 作成日
@@ -21,20 +21,20 @@ class GameRecord extends HiveObject{
   List<ScoreItem> scoreItems; // 項目記録
 
   @HiveField(4)
-  List<PlayerTotalScore> players; // プレイヤーの合計点
+  List<PlayerTotalScore> playerTotalScores; // プレイヤーの合計点
 
-  GameRecord({
+  ScoreRecord({
     required this.id,
-    required this.game,
+    required this.boardGame,
     required this.createdAt,
     required this.scoreItems,
-    required this.players,
+    required this.playerTotalScores,
   });
 }
 
 // 得点項目
 @HiveType(typeId: HiveTypeIds.scoreItem)
-class ScoreItem{
+class ScoreItem {
   @HiveField(0)
   String itemName; // 項目名
 
@@ -49,7 +49,7 @@ class ScoreItem{
 
 // プレイヤーの項目得点
 @HiveType(typeId: HiveTypeIds.playerScore)
-class PlayerScore{
+class PlayerScore {
   @HiveField(0)
   User player; // プレイヤー
 
@@ -64,7 +64,7 @@ class PlayerScore{
 
 // プレイヤーの合計点
 @HiveType(typeId: HiveTypeIds.playerTotalScore)
-class PlayerTotalScore{
+class PlayerTotalScore {
   @HiveField(0)
   User player; // プレイヤー
 

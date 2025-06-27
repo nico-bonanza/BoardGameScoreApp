@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game_score_app/models/board_game.dart';
-import 'package:game_score_app/models/game_record.dart';
+import 'package:game_score_app/models/score_record.dart';
 import 'package:game_score_app/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,14 +16,14 @@ void main() async {
   // 型アダプター登録
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(BoardGameAdapter());
-  Hive.registerAdapter(GameRecordAdapter());
+  Hive.registerAdapter(ScoreRecordAdapter());
   Hive.registerAdapter(ScoreItemAdapter());
   Hive.registerAdapter(PlayerScoreAdapter());
   Hive.registerAdapter(PlayerTotalScoreAdapter());
   // モデルをHiveで利用可能な状態にする（インデックス情報などのメモリマッピング）
   await Hive.openBox<User>('users');
   await Hive.openBox<BoardGame>('boardGames');
-  await Hive.openBox<GameRecord>('gameRecords');
+  await Hive.openBox<ScoreRecord>('scoreRecords');
 
   runApp(const MyApp());
 }
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: const [
+        Locale('ja'), // 日本語
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.purple,

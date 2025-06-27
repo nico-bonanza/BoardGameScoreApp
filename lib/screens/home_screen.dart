@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/screens/board_game_list_screen.dart';
+import 'package:game_score_app/screens/score_record_list_screen.dart';
 import 'package:game_score_app/screens/user_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,9 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     BoardGameListScreen(), // ボドゲ棚
     UserListScreen(), // ユーザー
-    Center(
-      child: Text('他のがめん'),
-    ),
+    ScoreRecordListScreen(), // スコア記録
   ];
 
   @override

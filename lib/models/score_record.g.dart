@@ -1,44 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'game_record.dart';
+part of 'score_record.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class GameRecordAdapter extends TypeAdapter<GameRecord> {
+class ScoreRecordAdapter extends TypeAdapter<ScoreRecord> {
   @override
   final int typeId = 2;
 
   @override
-  GameRecord read(BinaryReader reader) {
+  ScoreRecord read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return GameRecord(
+    return ScoreRecord(
       id: fields[0] as String,
-      game: fields[1] as BoardGame,
+      boardGame: fields[1] as BoardGame,
       createdAt: fields[2] as DateTime,
       scoreItems: (fields[3] as List).cast<ScoreItem>(),
-      players: (fields[4] as List).cast<PlayerTotalScore>(),
+      playerTotalScores: (fields[4] as List).cast<PlayerTotalScore>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, GameRecord obj) {
+  void write(BinaryWriter writer, ScoreRecord obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.game)
+      ..write(obj.boardGame)
       ..writeByte(2)
       ..write(obj.createdAt)
       ..writeByte(3)
       ..write(obj.scoreItems)
       ..writeByte(4)
-      ..write(obj.players);
+      ..write(obj.playerTotalScores);
   }
 
   @override
@@ -47,7 +47,7 @@ class GameRecordAdapter extends TypeAdapter<GameRecord> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GameRecordAdapter &&
+      other is ScoreRecordAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
