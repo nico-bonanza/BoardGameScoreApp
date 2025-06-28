@@ -117,8 +117,106 @@ class _ScoreRecordScreenState extends State<ScoreRecordScreen> {
               ],
             ),
           ),
+          // 線
           const Divider(),
-          // 他のUIへ続く
+          // テーブル
+          Padding(
+              padding: EdgeInsets.fromLTRB(10.0, 8.0, 10.0, 0),
+              child: Table(
+                border: TableBorder.all(color: Theme.of(context).dividerColor),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                columnWidths: const {
+                  0: FixedColumnWidth(150), // 行名の幅
+                },
+                children: const [
+                  // ユーザー行
+                  TableRow(
+                    children: [
+                      SizedBox(
+                        child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('\u200B')),
+                      ), // 左上空白
+                      Center(child: Text('ゆうこ')),
+                      Center(child: Text('ゆうこ')),
+                    ],
+                  ),
+
+                  // 得点項目行
+                  // 行1：農地
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('農地'),
+                      ),
+                      Center(child: Text('20')),
+                      Center(child: Text('25')),
+                    ],
+                  ),
+                  // 行2：道
+                  // TableRow(
+                  //   children: [
+                  //     Padding(
+                  //       padding: EdgeInsets.all(8.0),
+                  //       child: Text('道'),
+                  //     ),
+                  //     Center(child: Text('30')),
+                  //     Center(child: Text('28')),
+                  //   ],
+                  // ),
+                  // // 行3：修道院
+                  // TableRow(
+                  //   children: [
+                  //     Padding(
+                  //       padding: EdgeInsets.all(8.0),
+                  //       child: FittedBox(
+                  //         fit: BoxFit.scaleDown,
+                  //         child: Text('トークンのある魚✖︎1'),
+                  //       ),
+                  //     ),
+                  //     Center(child: Text('38')),
+                  //     Center(child: Text('39')),
+                  //   ],
+                  // ),
+                ],
+              )),
+          // 合計テーブル
+          Padding(
+              padding: EdgeInsets.fromLTRB(10.0, 4.0, 10.0, 0),
+              child: Table(
+                border: TableBorder.all(color: Theme.of(context).dividerColor),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                columnWidths: const {
+                  0: FixedColumnWidth(150), // 行名の幅
+                },
+                children: const [
+                  // 合計行（ここが追加された行）
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          '合計',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          '${20 + 30 + 38}', // ← 実際は合計ロジックで算出
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          '${25 + 28 + 39}', // ← 実際は合計ロジックで算出
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )),
         ],
       ),
     );

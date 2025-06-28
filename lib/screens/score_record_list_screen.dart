@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/models/score_record.dart';
+import 'package:game_score_app/models/record.dart';
 import 'package:game_score_app/screens/score_record_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

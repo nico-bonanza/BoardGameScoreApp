@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:game_score_app/models/user.dart';
 import 'package:game_score_app/models/board_game.dart';
-import 'package:game_score_app/models/score_record.dart';
+import 'package:game_score_app/models/record.dart';
+import 'package:game_score_app/models/scoring_category.dart';
+import 'package:game_score_app/models/user_scoring_category_score.dart';
 import 'package:game_score_app/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:game_score_app/models/user.dart';
 
 void main() async {
   // flutter初期化
@@ -16,14 +18,15 @@ void main() async {
   // 型アダプター登録
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(BoardGameAdapter());
-  Hive.registerAdapter(ScoreRecordAdapter());
-  Hive.registerAdapter(ScoreItemAdapter());
-  Hive.registerAdapter(PlayerScoreAdapter());
-  Hive.registerAdapter(PlayerTotalScoreAdapter());
+  Hive.registerAdapter(RecordAdapter());
+  Hive.registerAdapter(ScoringCategoryAdapter());
+  Hive.registerAdapter(UserScoringCategoryScoreAdapter());
   // モデルをHiveで利用可能な状態にする（インデックス情報などのメモリマッピング）
   await Hive.openBox<User>('users');
   await Hive.openBox<BoardGame>('boardGames');
-  await Hive.openBox<ScoreRecord>('scoreRecords');
+  await Hive.openBox<Record>('records');
+  await Hive.openBox<ScoringCategory>('categories');
+  await Hive.openBox<UserScoringCategoryScore>('scores');
 
   runApp(const MyApp());
 }
