@@ -3,14 +3,14 @@ import 'package:game_score_app/modals/title_select_modal.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class ScoreRecordScreen extends StatefulWidget {
-  const ScoreRecordScreen({super.key});
+class RecordScreen extends StatefulWidget {
+  const RecordScreen({super.key});
 
   @override
-  State<ScoreRecordScreen> createState() => _ScoreRecordScreenState();
+  State<RecordScreen> createState() => _RecordScreenState();
 }
 
-class _ScoreRecordScreenState extends State<ScoreRecordScreen> {
+class _RecordScreenState extends State<RecordScreen> {
   String gameTitle = 'タイトルを選ぶ'; // 初期タイトル
   DateTime selectedDate = DateTime.now(); // 初期作成日
 
@@ -128,9 +128,9 @@ class _ScoreRecordScreenState extends State<ScoreRecordScreen> {
                 columnWidths: const {
                   0: FixedColumnWidth(150), // 行名の幅
                 },
-                children: const [
+                children: [
                   // ユーザー行
-                  TableRow(
+                  const TableRow(
                     children: [
                       SizedBox(
                         child: Padding(
@@ -138,7 +138,7 @@ class _ScoreRecordScreenState extends State<ScoreRecordScreen> {
                             child: Text('\u200B')),
                       ), // 左上空白
                       Center(child: Text('ゆうこ')),
-                      Center(child: Text('ゆうこ')),
+                      Center(child: Text('たかし')),
                     ],
                   ),
 
@@ -146,12 +146,36 @@ class _ScoreRecordScreenState extends State<ScoreRecordScreen> {
                   // 行1：農地
                   TableRow(
                     children: [
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text('農地'),
                       ),
-                      Center(child: Text('20')),
-                      Center(child: Text('25')),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: TextEditingController(text: '20'),
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center, // 中央揃え
+                          decoration: const InputDecoration(
+                            border: InputBorder.none, // 枠なし
+                            isDense: true, // 高さ詰める
+                            contentPadding: EdgeInsets.zero, // 余白なし
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: TextEditingController(text: '25'),
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center, // 中央揃え
+                          decoration: const InputDecoration(
+                            border: InputBorder.none, // 枠なし
+                            isDense: true, // 高さ詰める
+                            contentPadding: EdgeInsets.zero, // 余白なし
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   // 行2：道

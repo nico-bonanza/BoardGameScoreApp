@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/screens/board_game_list_screen.dart';
-import 'package:game_score_app/screens/score_record_list_screen.dart';
+import 'package:game_score_app/screens/record_list_screen.dart';
 import 'package:game_score_app/screens/user_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     BoardGameListScreen(), // ボドゲ棚
     UserListScreen(), // ユーザー
-    ScoreRecordListScreen(), // スコア記録
+    RecordListScreen(), // プレイ記録
   ];
 
   @override
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long),
-              label: 'スコア記録',
+              label: 'プレイ記録',
             ),
           ]),
     );

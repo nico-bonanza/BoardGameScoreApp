@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/models/board_game.dart';
 import 'package:game_score_app/models/record.dart';
-import 'package:game_score_app/screens/score_record_screen.dart';
+import 'package:game_score_app/screens/record_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class ScoreRecordListScreen extends StatelessWidget {
-  const ScoreRecordListScreen({super.key});
+class RecordListScreen extends StatelessWidget {
+  const RecordListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final box = Hive.box<ScoreRecord>('scoreRecords');
+    final box = Hive.box<Record>('records');
+
+    String getBoardGameName(String? boardGameId) {
+      if (boardGameId == null) return '不明なゲーム';
+      final box = Hive.box<BoardGame>('boardGames');
+      final boardGame = box.values.firstWhere((bg) => bg.id == boardGameId);
+      return boardGame.title;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -16,15 +24,15 @@ class ScoreRecordListScreen extends StatelessWidget {
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
-        builder: (context, Box<ScoreRecord> scoreRecordBox, _) {
-          if (scoreRecordBox.isEmpty) {
+        builder: (context, Box<Record> recordBox, _) {
+          if (recordBox.isEmpty) {
             return const Center(child: Text('あなたの後ろに道はない。'));
           }
 
           return ListView.builder(
-            itemCount: scoreRecordBox.length,
+            itemCount: recordBox.length,
             itemBuilder: (context, index) {
-              final scoreRecord = scoreRecordBox.getAt(index);
+              final record = recordBox.getAt(index);
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -34,11 +42,11 @@ class ScoreRecordListScreen extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    scoreRecord?.boardGame.title ?? '無名',
+                    getBoardGameName(record?.boardGameId),
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text('UUID: ${scoreRecord?.id ?? '-'}'),
+                  subtitle: Text('UUID: ${record?.id ?? '-'}'),
                   leading: const Icon(Icons.receipt_long),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
@@ -55,7 +63,7 @@ class ScoreRecordListScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ScoreRecordScreen(),
+              builder: (context) => RecordScreen(),
             ),
           );
         },
