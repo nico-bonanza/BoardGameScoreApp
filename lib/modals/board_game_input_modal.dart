@@ -27,7 +27,7 @@ class _BoardGameInputModalState extends State<BoardGameInputModal> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: MediaQuery.of(context).viewInsets, // キーボード対応
+      padding: MediaQuery.of(context).viewInsets, // キーボード出現時にパディングで位置調整
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

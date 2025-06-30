@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:game_score_app/models/record.dart';
-import 'package:game_score_app/screens/record_screen.dart';
+import 'package:game_score_app/screens/record_edit_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class RecordListScreen extends StatelessWidget {
@@ -20,7 +20,7 @@ class RecordListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('スコア記録'),
+        title: Text('プレイ記録'),
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
@@ -63,7 +63,7 @@ class RecordListScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RecordScreen(),
+              builder: (context) => RecordEditScreen(),
             ),
           );
         },

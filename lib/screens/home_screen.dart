@@ -15,9 +15,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ボトムナビゲータの画面配列
   final List<Widget> _screens = [
+    RecordListScreen(), // プレイ記録
     BoardGameListScreen(), // ボドゲ棚
     UserListScreen(), // ユーザー
-    RecordListScreen(), // プレイ記録
   ];
 
   @override
@@ -33,16 +33,16 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           items: const [
             BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long),
+              label: 'プレイ記録',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.shelves),
               label: 'ボドゲ棚',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.people_alt),
               label: 'ユーザー',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long),
-              label: 'プレイ記録',
             ),
           ]),
     );

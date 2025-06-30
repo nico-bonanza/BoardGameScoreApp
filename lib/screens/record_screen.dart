@@ -60,10 +60,89 @@ class _RecordScreenState extends State<RecordScreen> {
     }
   }
 
+  // 得点項目（行）
+  final List<String> scoringCategories = ['農地', '道', '修道院だけど長いとどう'];
+
+  // ユーザー（列）
+  final List<String> users = ['ゆうこ', 'たかし'];
+
+  // 2次元のコントローラー：rows x cols
+  late final List<List<TextEditingController>> controllers;
+
+// 得点合計の計算
+  int _calculateColumnTotal(int col) {
+    int sum = 0;
+    for (var row in controllers) {
+      final val = int.tryParse(row[col].text) ?? 0;
+      sum += val;
+    }
+    return sum;
+  }
+
+// テーブル構成の初期化
+  @override
+  void initState() {
+    super.initState();
+    controllers = List.generate(
+      scoringCategories.length,
+      (_) => List.generate(users.length, (_) => TextEditingController()),
+    );
+  }
+
+  // 画面切り替え時のメモリリーク
+  @override
+  void dispose() {
+    for (var row in controllers) {
+      for (var ctrl in row) {
+        ctrl.dispose();
+      }
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("スコア記録")),
+      appBar: AppBar(
+        title: const Text("プレイ記録"),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {
+                // 親scaffold内のendDrawerウィジェットを開く
+                Scaffold.of(context).openEndDrawer();
+              },
+            ),
+          ),
+        ],
+      ),
+      // 右ドロワー
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              // decoration: BoxDecoration(color: Colors.blue),
+              child: Text('メニュー'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_note),
+              title: const Text('表の編集'),
+              onTap: () {
+                // 設定モーダルや画面遷移
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.help),
+              title: const Text('なにか'),
+              onTap: () {
+                // ヘルプ画面
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         // Column：子要素縦並び
         crossAxisAlignment: CrossAxisAlignment.center, // 縦並び交差配置：水平中央
@@ -121,126 +200,93 @@ class _RecordScreenState extends State<RecordScreen> {
           const Divider(),
           // テーブル
           Padding(
-              padding: EdgeInsets.fromLTRB(10.0, 8.0, 10.0, 0),
-              child: Table(
-                border: TableBorder.all(color: Theme.of(context).dividerColor),
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                columnWidths: const {
-                  0: FixedColumnWidth(150), // 行名の幅
-                },
-                children: [
-                  // ユーザー行
-                  const TableRow(
-                    children: [
-                      SizedBox(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('\u200B')),
-                      ), // 左上空白
-                      Center(child: Text('ゆうこ')),
-                      Center(child: Text('たかし')),
-                    ],
-                  ),
-
-                  // 得点項目行
-                  // 行1：農地
+            padding: EdgeInsets.fromLTRB(10.0, 8.0, 10.0, 0),
+            child: Table(
+              border: TableBorder.all(color: Theme.of(context).dividerColor),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              columnWidths: const {
+                0: FixedColumnWidth(150),
+              },
+              children: [
+                // ヘッダー行
+                TableRow(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('\u200B'),
+                    ),
+                    for (final user in users) Center(child: Text(user)),
+                  ],
+                ),
+                // 各得点行
+                for (int row = 0; row < scoringCategories.length; row++)
+                  // 行
                   TableRow(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('農地'),
-                      ),
+                      // 列：得点項目列
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          controller: TextEditingController(text: '20'),
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center, // 中央揃え
-                          decoration: const InputDecoration(
-                            border: InputBorder.none, // 枠なし
-                            isDense: true, // 高さ詰める
-                            contentPadding: EdgeInsets.zero, // 余白なし
+                        child: Text(scoringCategories[row]),
+                      ),
+                      //列： 得点（ユーザーごと）
+                      for (int col = 0; col < users.length; col++)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: controllers[row][col],
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            onChanged: (_) => setState(() {}),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: TextField(
-                          controller: TextEditingController(text: '25'),
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center, // 中央揃え
-                          decoration: const InputDecoration(
-                            border: InputBorder.none, // 枠なし
-                            isDense: true, // 高さ詰める
-                            contentPadding: EdgeInsets.zero, // 余白なし
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                  // 行2：道
-                  // TableRow(
-                  //   children: [
-                  //     Padding(
-                  //       padding: EdgeInsets.all(8.0),
-                  //       child: Text('道'),
-                  //     ),
-                  //     Center(child: Text('30')),
-                  //     Center(child: Text('28')),
-                  //   ],
-                  // ),
-                  // // 行3：修道院
-                  // TableRow(
-                  //   children: [
-                  //     Padding(
-                  //       padding: EdgeInsets.all(8.0),
-                  //       child: FittedBox(
-                  //         fit: BoxFit.scaleDown,
-                  //         child: Text('トークンのある魚✖︎1'),
-                  //       ),
-                  //     ),
-                  //     Center(child: Text('38')),
-                  //     Center(child: Text('39')),
-                  //   ],
-                  // ),
-                ],
-              )),
-          // 合計テーブル
+              ],
+            ),
+          ),
+
+          // 合計行テーブル
           Padding(
-              padding: EdgeInsets.fromLTRB(10.0, 4.0, 10.0, 0),
-              child: Table(
-                border: TableBorder.all(color: Theme.of(context).dividerColor),
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                columnWidths: const {
-                  0: FixedColumnWidth(150), // 行名の幅
-                },
-                children: const [
-                  // 合計行（ここが追加された行）
-                  TableRow(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          '合計',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+            padding: const EdgeInsets.fromLTRB(10.0, 4.0, 10.0, 0),
+            child: Table(
+              border: TableBorder.all(color: Theme.of(context).dividerColor),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              columnWidths: const {
+                0: FixedColumnWidth(150),
+              },
+              children: [
+                TableRow(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '合計',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                    ),
+                    for (int col = 0; col < users.length; col++)
                       Center(
+                          child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 3.0, 0),
                         child: Text(
-                          '${20 + 30 + 38}', // ← 実際は合計ロジックで算出
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          '${_calculateColumnTotal(col)}',
+                          style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      Center(
-                        child: Text(
-                          '${25 + 28 + 39}', // ← 実際は合計ロジックで算出
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )),
+                      )),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
