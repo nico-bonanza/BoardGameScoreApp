@@ -50,7 +50,7 @@ class _TitleSelectModalState extends State<TitleSelectModal> {
             const SizedBox(height: 8),
             TextField(
               decoration: const InputDecoration(
-                hintText: "タイトルを入力...",
+                hintText: "タイトルを検索...",
                 border: OutlineInputBorder(),
               ),
               onChanged: _updateQuery,
