@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/modals/board_game_input_modal.dart';
-import 'package:game_score_app/models/board_game.dart';
+import 'package:game_score_app/presentation/widgets/modals/board_game_input_modal.dart';
+import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class BoardGameListScreen extends StatelessWidget {

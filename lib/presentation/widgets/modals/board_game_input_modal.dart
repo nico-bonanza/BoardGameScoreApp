@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/service/board_game_service.dart';
+import 'package:game_score_app/application/service/board_game_service.dart';
 
 class BoardGameInputModal extends StatefulWidget {
   const BoardGameInputModal({super.key});

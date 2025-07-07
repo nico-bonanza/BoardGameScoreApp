@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/service/user_service.dart';
+import 'package:game_score_app/application/service/user_service.dart';
 
 class UserInputModal extends StatefulWidget {
   const UserInputModal({super.key});

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:game_score_app/models/user.dart';
-import 'package:game_score_app/models/board_game.dart';
-import 'package:game_score_app/models/record.dart';
-import 'package:game_score_app/models/scoring_category.dart';
-import 'package:game_score_app/models/user_scoring_category_score.dart';
-import 'package:game_score_app/screens/home_screen.dart';
+import 'package:game_score_app/domain/models/user.dart';
+import 'package:game_score_app/domain/models/board_game.dart';
+import 'package:game_score_app/domain/models/record.dart';
+import 'package:game_score_app/domain/models/scoring_category.dart';
+import 'package:game_score_app/domain/models/user_scoring_category_score.dart';
+import 'package:game_score_app/presentation/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

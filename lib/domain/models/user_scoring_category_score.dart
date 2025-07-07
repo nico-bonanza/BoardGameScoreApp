@@ -1,4 +1,4 @@
-import 'package:game_score_app/models/hive_type_ids.dart';
+import 'package:game_score_app/domain/models/hive_type_ids.dart';
 import 'package:hive/hive.dart';
 
 part 'user_scoring_category_score.g.dart';

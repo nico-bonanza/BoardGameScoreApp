@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
-import '../models/board_game.dart';
+import '../../domain/models/board_game.dart';
 
 // ボードゲームサービス
 class BoardGameService {

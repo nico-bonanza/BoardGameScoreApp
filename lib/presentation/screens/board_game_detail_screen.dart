@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/models/board_game.dart';
-import 'package:game_score_app/models/scoring_category.dart';
+import 'package:game_score_app/domain/models/board_game.dart';
+import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class _BoardGameDetailScreen extends StatefulWidget {

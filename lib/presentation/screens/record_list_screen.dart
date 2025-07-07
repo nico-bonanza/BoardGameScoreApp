@@ -1,33 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/modals/user_input_modal.dart';
-import 'package:game_score_app/models/user.dart';
+import 'package:game_score_app/domain/models/board_game.dart';
+import 'package:game_score_app/domain/models/record.dart';
+import 'package:game_score_app/presentation/screens/record_edit_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class UserListScreen extends StatelessWidget {
-  const UserListScreen({super.key});
+class RecordListScreen extends StatelessWidget {
+  const RecordListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final box = Hive.box<User>('users');
+    final box = Hive.box<Record>('records');
+
+    String getBoardGameName(String? boardGameId) {
+      if (boardGameId == null) return '不明なゲーム';
+      final box = Hive.box<BoardGame>('boardGames');
+      final boardGame = box.values.firstWhere((bg) => bg.id == boardGameId);
+      return boardGame.title;
+    }
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // 戻るボタンを無効化
-        title: Text('ユーザー'),
+        title: Text('プレイ記録'),
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
-        builder: (context, Box<User> userBox, _) {
-          // データがない場合のメイン表示
-          if (userBox.isEmpty) {
-            return const Center(child: Text('あなたは孤高のソロボーダー'));
+        builder: (context, Box<Record> recordBox, _) {
+          if (recordBox.isEmpty) {
+            return const Center(child: Text('あなたの後ろに道はない。'));
           }
 
-          // メイン表示
           return ListView.builder(
-            itemCount: userBox.length,
+            itemCount: recordBox.length,
             itemBuilder: (context, index) {
-              final user = userBox.getAt(index);
+              final record = recordBox.getAt(index);
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -37,12 +43,12 @@ class UserListScreen extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    user?.name ?? '無名',
+                    getBoardGameName(record?.boardGameId),
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text('UUID: ${user?.id ?? '-'}'),
-                  leading: const Icon(Icons.person),
+                  subtitle: Text('UUID: ${record?.id ?? '-'}'),
+                  leading: const Icon(Icons.receipt_long),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     // 詳細とか編集とか
@@ -53,18 +59,13 @@ class UserListScreen extends StatelessWidget {
           );
         },
       ),
-
-      // 右下プラスボタン
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // モーダル表示
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true, // キーボードで自動調整
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RecordEditScreen(),
             ),
-            builder: (context) => UserInputModal(),
           );
         },
         child: const Icon(Icons.add),

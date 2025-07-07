@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/screens/board_game_list_screen.dart';
-import 'package:game_score_app/screens/record_list_screen.dart';
-import 'package:game_score_app/screens/user_list_screen.dart';
+import 'package:game_score_app/presentation/screens/board_game_list_screen.dart';
+import 'package:game_score_app/presentation/screens/record_list_screen.dart';
+import 'package:game_score_app/presentation/screens/user_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

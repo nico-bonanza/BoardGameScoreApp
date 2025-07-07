@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/models/board_game.dart';
+import 'package:game_score_app/domain/models/board_game.dart';
 
 class TitleSelectModal extends StatefulWidget {
   final List<BoardGame> allBoardGames;

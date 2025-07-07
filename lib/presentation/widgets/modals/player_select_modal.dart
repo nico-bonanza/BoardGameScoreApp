@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/models/user.dart';
+import 'package:game_score_app/domain/models/user.dart';
 
 class PlayerSelectModal extends StatefulWidget {
   final List<User> allUsers;

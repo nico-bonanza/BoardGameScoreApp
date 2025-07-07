@@ -1,4 +1,4 @@
-import 'package:game_score_app/models/user.dart';
+import 'package:game_score_app/domain/models/user.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
