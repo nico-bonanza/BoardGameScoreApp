@@ -18,17 +18,20 @@ class ScoringCategoryAdapter extends TypeAdapter<ScoringCategory> {
     };
     return ScoringCategory(
       id: fields[0] as String,
-      name: fields[1] as String,
+      boardGameId: fields[1] as String,
+      name: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ScoringCategory obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
+      ..write(obj.boardGameId)
+      ..writeByte(2)
       ..write(obj.name);
   }
 

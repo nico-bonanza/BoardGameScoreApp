@@ -7,11 +7,11 @@ part 'user_scoring_category_score.g.dart';
 @HiveType(typeId: HiveTypeIds.userScoringCategoryScore)
 class UserScoringCategoryScore extends HiveObject {
   @HiveField(0)
-  String scoreRecordId; // 記録ID
+  String scoreRecordId; // 外部キー：記録ID
   @HiveField(1)
-  String userId; // ユーザーID
+  String userId; // 外部キー：ユーザーID
   @HiveField(2)
-  String scoringCategoryId; // 得点項目ID
+  String scoringCategoryId; // 外部キー：得点項目ID
   @HiveField(3)
   int score; // 得点
 

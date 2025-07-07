@@ -3,21 +3,34 @@ import 'package:game_score_app/modals/player_select_modal.dart';
 import 'package:game_score_app/modals/title_select_modal.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:game_score_app/models/user.dart';
-import 'package:game_score_app/screens/record_screen.dart';
+import 'package:game_score_app/screens/record_detail_screen.dart';
 import 'package:game_score_app/utils/date_utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class RecordEditScreen extends StatefulWidget {
-  const RecordEditScreen({super.key});
+  final BoardGame? boardGame;
+  final List<User>? players;
+  final DateTime? date;
+
+  const RecordEditScreen({super.key, this.boardGame, this.players, this.date});
 
   @override
   State<RecordEditScreen> createState() => _RecordEditScreenState();
 }
 
 class _RecordEditScreenState extends State<RecordEditScreen> {
-  BoardGame? selectedBoardGame;
-  DateTime selectedDate = DateTime.now(); // 初期作成日
-  List<User> selectedPlayers = [];
+  static const double appSpacing = 10;
+  late BoardGame? selectedBoardGame;
+  late DateTime selectedDate; // 初期作成日
+  late List<User> selectedPlayers;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedBoardGame = widget.boardGame;
+    selectedPlayers = widget.players ?? [];
+    selectedDate = widget.date ?? DateTime.now();
+  }
 
   // タイトル部分タップ
   void _tapTitle() async {
@@ -84,35 +97,54 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
     }
   }
 
+  // 保存/ヴァリデーションエラー表示
+  void _onPressedSaveIcon() {
+    List<String> messages = [];
+
+    if (selectedBoardGame == null) {
+      messages.add('・タイトルを選んでください');
+    }
+    if (selectedPlayers.isEmpty) {
+      messages.add('・プレイヤーを選択してください');
+    }
+
+    if (messages.isNotEmpty) {
+      final errorText = messages.join('\n');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorText),
+        ),
+      );
+      return; // 保存処理に進まない
+    }
+
+    // すべての入力がそろっていれば保存画面へ遷移
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecordDetailScreen(
+          boardGame: selectedBoardGame!,
+          date: selectedDate,
+          players: selectedPlayers,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           title: const Text("プレイ記録編集"),
           actions: [
-            selectedBoardGame == null
-                ? Tooltip(
-                    message: 'タイトルを選んでください',
-                    child: IconButton(
-                      icon: const Icon(Icons.save, color: Colors.grey),
-                      onPressed: null, // 無効化
-                    ),
-                  )
-                : IconButton(
-                    icon: Icon(Icons.save),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RecordScreen(
-                            boardGame: selectedBoardGame,
-                            date: selectedDate,
-                            players: selectedPlayers,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+            IconButton(
+                icon: Icon(Icons.save),
+                onPressed: () {
+                  _onPressedSaveIcon();
+                },
+              ),
           ],
         ),
         body: Align(
@@ -123,7 +155,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
                     crossAxisAlignment:
                         CrossAxisAlignment.start, // 縦並び交差配置：水平中央
                     children: [
-                  const SizedBox(height: 5),
+                  const SizedBox(height: appSpacing),
 
                   const Text(
                     'タイトル',
@@ -157,7 +189,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: appSpacing),
                   const Text(
                     '日付',
                     style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -191,7 +223,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: appSpacing),
                   const Text(
                     'プレイヤー',
                     style: TextStyle(fontSize: 14, color: Colors.grey),

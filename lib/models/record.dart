@@ -9,7 +9,7 @@ class Record extends HiveObject {
   @HiveField(0)
   String id; // UUID
   @HiveField(1)
-  String boardGameId; // ボドゲID
+  String boardGameId; // 外部キー：ボドゲID
   @HiveField(2)
   DateTime createdAt; // 作成日
   @HiveField(3)

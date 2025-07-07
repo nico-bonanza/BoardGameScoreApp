@@ -12,13 +12,14 @@ class BoardGameListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // 戻るボタンを無効化
         title: Text('ボドゲ棚'),
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
         builder: (context, Box<BoardGame> boardGameBox, _) {
           if (boardGameBox.isEmpty) {
-            return const Center(child: Text('棚 is 空'));
+            return const Center(child: Text('TANA is YOU'));
           }
 
           return ListView.builder(

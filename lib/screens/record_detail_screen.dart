@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/models/board_game.dart';
 import 'package:game_score_app/models/user.dart';
+import 'package:game_score_app/screens/home_screen.dart';
+import 'package:game_score_app/screens/record_edit_screen.dart';
 import 'package:game_score_app/utils/date_utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class RecordScreen extends StatefulWidget {
+class RecordDetailScreen extends StatefulWidget {
   final BoardGame? boardGame;
   final DateTime date;
   final List<User> players;
 
-  const RecordScreen(
+  const RecordDetailScreen(
       {super.key,
       required this.boardGame,
       required this.players,
       required this.date});
 
   @override
-  State<RecordScreen> createState() => _RecordScreenState();
+  State<RecordDetailScreen> createState() => _RecordDetailScreenState();
 }
 
-class _RecordScreenState extends State<RecordScreen> {
+class _RecordDetailScreenState extends State<RecordDetailScreen> {
   // 得点項目（行）
   final List<String> scoringCategories = ['農地', '道', '修道院だけど長いとどう'];
 
@@ -65,6 +67,16 @@ class _RecordScreenState extends State<RecordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ),
+            );
+          },
+        ),
         title: const Text("プレイ記録"),
         actions: [
           Builder(
@@ -90,7 +102,16 @@ class _RecordScreenState extends State<RecordScreen> {
               leading: const Icon(Icons.edit_note),
               title: const Text('表の編集'),
               onTap: () {
-                // 設定モーダルや画面遷移
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RecordEditScreen(
+                      boardGame: widget.boardGame,
+                      date: widget.date,
+                      players: widget.players,
+                    ),
+                  ),
+                );
               },
             ),
             ListTile(

@@ -9,10 +9,13 @@ class ScoringCategory extends HiveObject {
   @HiveField(0)
   String id; // uuid
   @HiveField(1)
-  String name; // ユーザーID
+  String boardGameId; // 外部キー：ボドゲID
+  @HiveField(2)
+  String name; // 項目名
 
   ScoringCategory({
     required this.id,
+    required this.boardGameId,
     required this.name,
   });
 }

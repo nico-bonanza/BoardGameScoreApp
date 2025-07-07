@@ -20,6 +20,7 @@ class RecordListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // 戻るボタンを無効化
         title: Text('プレイ記録'),
       ),
       body: ValueListenableBuilder(

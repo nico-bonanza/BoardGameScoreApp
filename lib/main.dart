@@ -25,8 +25,8 @@ void main() async {
   await Hive.openBox<User>('users');
   await Hive.openBox<BoardGame>('boardGames');
   await Hive.openBox<Record>('records');
-  await Hive.openBox<ScoringCategory>('categories');
-  await Hive.openBox<UserScoringCategoryScore>('scores');
+  await Hive.openBox<ScoringCategory>('scoringCategories');
+  await Hive.openBox<UserScoringCategoryScore>('userScoringCategoryScores');
 
   runApp(const MyApp());
 }
