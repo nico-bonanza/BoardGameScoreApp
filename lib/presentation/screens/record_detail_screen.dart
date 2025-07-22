@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
+import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/domain/models/user.dart';
 import 'package:game_score_app/presentation/screens/home_screen.dart';
 import 'package:game_score_app/presentation/screens/record_edit_screen.dart';
@@ -10,24 +11,20 @@ class RecordDetailScreen extends StatefulWidget {
   final BoardGame? boardGame;
   final DateTime date;
   final List<User> players;
+  final List<ScoringCategory> scoringCategories;
 
   const RecordDetailScreen(
       {super.key,
       required this.boardGame,
       required this.players,
-      required this.date});
+      required this.date,
+      required this.scoringCategories});
 
   @override
   State<RecordDetailScreen> createState() => _RecordDetailScreenState();
 }
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> {
-  // 得点項目（行）
-  final List<String> scoringCategories = ['農地', '道', '修道院だけど長いとどう'];
-
-  // // ユーザー（列）
-  // List<User> players = [];
-
   // 2次元のコントローラー：rows x cols
   late final List<List<TextEditingController>> controllers;
 
@@ -46,7 +43,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   void initState() {
     super.initState();
     controllers = List.generate(
-      scoringCategories.length,
+      widget.scoringCategories.length,
       (_) =>
           List.generate(widget.players.length, (_) => TextEditingController()),
     );
@@ -192,14 +189,14 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
                   ],
                 ),
                 // 各得点行
-                for (int row = 0; row < scoringCategories.length; row++)
+                for (int row = 0; row < widget.scoringCategories.length; row++)
                   // 行
                   TableRow(
                     children: [
                       // 列：得点項目列
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(scoringCategories[row]),
+                        child: Text(widget.scoringCategories[row].name),
                       ),
                       //列： 得点（ユーザーごと）
                       for (int col = 0; col < widget.players.length; col++)

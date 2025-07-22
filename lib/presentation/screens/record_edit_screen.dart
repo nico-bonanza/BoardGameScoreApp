@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/presentation/widgets/modals/player_select_modal.dart';
+import 'package:game_score_app/presentation/widgets/modals/scoring_category_select_modal.dart';
 import 'package:game_score_app/presentation/widgets/modals/title_select_modal.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/user.dart';
@@ -10,9 +12,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 class RecordEditScreen extends StatefulWidget {
   final BoardGame? boardGame;
   final List<User>? players;
+  final List<ScoringCategory>? scoringCategories;
   final DateTime? date;
 
-  const RecordEditScreen({super.key, this.boardGame, this.players, this.date});
+  const RecordEditScreen({super.key, this.boardGame, this.players, this.date, this.scoringCategories});
 
   @override
   State<RecordEditScreen> createState() => _RecordEditScreenState();
@@ -23,12 +26,14 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
   late BoardGame? selectedBoardGame;
   late DateTime selectedDate; // 初期作成日
   late List<User> selectedPlayers;
+  late List<ScoringCategory> selectedScoringCategories;
 
   @override
   void initState() {
     super.initState();
     selectedBoardGame = widget.boardGame;
     selectedPlayers = widget.players ?? [];
+    selectedScoringCategories = widget.scoringCategories ?? [];
     selectedDate = widget.date ?? DateTime.now();
   }
 
@@ -73,7 +78,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
     }
   }
 
-  // タイトル部分タップ
+  // プレイヤー
   void _tapPlayer() async {
     final usersBox = Hive.box<User>('users');
     final allUsers = usersBox.values.toList();
@@ -97,6 +102,32 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
     }
   }
 
+    // 得点項目
+  void _tapScoringCategory() async {
+    final scoringCategoryBox = Hive.box<ScoringCategory>('scoringCategories');
+    final allScoringCategories = scoringCategoryBox.values
+        .where((e) => e.boardGameId == selectedBoardGame?.id)
+        .toList();
+
+    final selectedItems = await showModalBottomSheet<List<ScoringCategory>>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: ScoringCategorySelectModal(allScoringCategories: allScoringCategories),
+        );
+      },
+    );
+
+    if (selectedItems != null) {
+      setState(() {
+        selectedScoringCategories = selectedItems;
+        // 必要なら ID など他のプロパティも保持可能
+      });
+    }
+  }
+
   // 保存/ヴァリデーションエラー表示
   void _onPressedSaveIcon() {
     List<String> messages = [];
@@ -106,6 +137,9 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
     }
     if (selectedPlayers.isEmpty) {
       messages.add('・プレイヤーを選択してください');
+    }
+    if (selectedScoringCategories.isEmpty) {
+      messages.add('・得点項目を選択してください');
     }
 
     if (messages.isNotEmpty) {
@@ -127,6 +161,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
           boardGame: selectedBoardGame!,
           date: selectedDate,
           players: selectedPlayers,
+          scoringCategories: selectedScoringCategories,
         ),
       ),
     );
@@ -229,7 +264,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 1),
-                  // タイトル要素：ジェスチャー検知
+                  // プレイヤー要素：ジェスチャー検知
                   GestureDetector(
                     onTap: _tapPlayer,
                     // この子へのタップを検知する。
@@ -260,6 +295,45 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: selectedPlayers
                         .map((player) => Text(player.name))
+                        .toList(),
+                  ),
+                  const SizedBox(height: appSpacing),
+                  const Text(
+                    '得点項目',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 1),
+                  // 得点項目要素：ジェスチャー検知
+                  GestureDetector(
+                    onTap: _tapScoringCategory,
+                    // この子へのタップを検知する。
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '得点項目を選ぶ',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                decorationColor:
+                                    Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: selectedScoringCategories
+                        .map((scoringCategory) => Text(scoringCategory.name))
                         .toList(),
                   )
                 ]))));

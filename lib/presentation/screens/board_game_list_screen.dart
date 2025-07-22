@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/presentation/screens/board_game_detail_screen.dart';
 import 'package:game_score_app/presentation/widgets/modals/board_game_input_modal.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -43,7 +44,14 @@ class BoardGameListScreen extends StatelessWidget {
                   leading: const Icon(Icons.pentagon),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    // 詳細とか編集とか
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BoardGameDetailScreen(
+                          boardGame: boardGame!,
+                        ),
+                      ),
+                    );
                   },
                 ),
               );
