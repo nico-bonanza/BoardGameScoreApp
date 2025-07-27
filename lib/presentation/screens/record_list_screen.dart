@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/record.dart';
+import 'package:game_score_app/presentation/screens/record_detail_screen.dart';
 import 'package:game_score_app/presentation/screens/record_edit_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -51,7 +52,14 @@ class RecordListScreen extends StatelessWidget {
                   leading: const Icon(Icons.receipt_long),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    // 詳細とか編集とか
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecordDetailScreen(
+                          record: record!,
+                        ),
+                      ),
+                    );
                   },
                 ),
               );

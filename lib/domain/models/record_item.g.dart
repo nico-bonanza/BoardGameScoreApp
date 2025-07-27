@@ -1,43 +1,49 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'record.dart';
+part of 'record_item.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class RecordAdapter extends TypeAdapter<Record> {
+class RecordItemAdapter extends TypeAdapter<RecordItem> {
   @override
-  final int typeId = 2;
+  final int typeId = 3;
 
   @override
-  Record read(BinaryReader reader) {
+  RecordItem read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Record(
+    return RecordItem(
       id: fields[0] as String,
-      boardGameId: fields[1] as String,
-      isSynced: fields[2] as bool,
-      createdAt: fields[3] as DateTime,
-      updatedAt: fields[4] as DateTime,
+      recordId: fields[1] as String,
+      userId: fields[2] as String,
+      scoringCategoryId: fields[3] as String,
+      score: fields[4] as int?,
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Record obj) {
+  void write(BinaryWriter writer, RecordItem obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.boardGameId)
+      ..write(obj.recordId)
       ..writeByte(2)
-      ..write(obj.isSynced)
+      ..write(obj.userId)
       ..writeByte(3)
-      ..write(obj.createdAt)
+      ..write(obj.scoringCategoryId)
       ..writeByte(4)
+      ..write(obj.score)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
       ..write(obj.updatedAt);
   }
 
@@ -47,7 +53,7 @@ class RecordAdapter extends TypeAdapter<Record> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RecordAdapter &&
+      other is RecordItemAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

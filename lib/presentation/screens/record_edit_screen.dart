@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:game_score_app/application/service/record_service.dart';
+import 'package:game_score_app/domain/models/record.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/presentation/widgets/modals/player_select_modal.dart';
 import 'package:game_score_app/presentation/widgets/modals/scoring_category_select_modal.dart';
@@ -22,6 +24,8 @@ class RecordEditScreen extends StatefulWidget {
 }
 
 class _RecordEditScreenState extends State<RecordEditScreen> {
+  final _recordService = RecordService();
+
   static const double appSpacing = 10;
   late BoardGame? selectedBoardGame;
   late DateTime selectedDate; // 初期作成日
@@ -128,8 +132,7 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
     }
   }
 
-  // 保存/ヴァリデーションエラー表示
-  void _onPressedSaveIcon() {
+  Future<void> _onPressedSaveIcon() async {
     List<String> messages = [];
 
     if (selectedBoardGame == null) {
@@ -153,15 +156,24 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
       return; // 保存処理に進まない
     }
 
-    // すべての入力がそろっていれば保存画面へ遷移
+    // 登録：記録
+    final record = await _recordService.createRecordAndGet(selectedBoardGame!);
+
+    // 登録：記録情報（ユーザー・得点項目）
+    for (var player in selectedPlayers) {
+      for (var sc in selectedScoringCategories) {
+        await _recordService.createRecordItem(record, sc, player);
+      }
+    }
+
+    if (!mounted) return; // context を使う前に確認
+
+    // 得点入力画面へ遷移（保存完了後）
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => RecordDetailScreen(
-          boardGame: selectedBoardGame!,
-          date: selectedDate,
-          players: selectedPlayers,
-          scoringCategories: selectedScoringCategories,
+          record: record,
         ),
       ),
     );
