@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:game_score_app/application/service/record_service.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/record.dart';
+import 'package:game_score_app/domain/models/record_item.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/domain/models/user.dart';
 import 'package:game_score_app/presentation/screens/home_screen.dart';
 import 'package:game_score_app/presentation/screens/record_edit_screen.dart';
 import 'package:game_score_app/utils/date_utils.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class RecordDetailScreen extends StatefulWidget {
   final Record record;
@@ -19,6 +21,7 @@ class RecordDetailScreen extends StatefulWidget {
 }
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> {
+  final _recordItemBox = Hive.box<RecordItem>('recordItems');
   final recordService = RecordService();
   late final BoardGame boardGame;
   late final List<User> players;
@@ -36,6 +39,43 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     return sum;
   }
 
+  Future<void> _saveScores() async {
+    for (int row = 0; row < scoringCategories.length; row++) {
+      final scoringCategoryId = scoringCategories[row].id;
+
+      for (int col = 0; col < players.length; col++) {
+        final userId = players[col].id;
+        final scoreText = controllers[row][col].text;
+
+        // 空欄はスキップ（または null を許容するなら続行）
+        if (scoreText.trim().isEmpty) continue;
+
+        final score = int.tryParse(scoreText);
+        if (score == null) continue; // 数字でない場合は無視
+
+        // RecordItemを取得
+        final recordItem = _recordItemBox.values.firstWhere(
+          (item) =>
+              item.recordId == widget.record.id &&
+              item.userId == userId &&
+              item.scoringCategoryId == scoringCategoryId
+        );
+
+        recordItem.score = score;
+        recordItem.updatedAt = DateTime.now();
+
+        // 更新保存
+        await recordItem.save();
+      }
+    }
+
+    if (!mounted) return; // context を使う前に確認
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('スコアを保存しました')),
+    );
+  }
+
 // テーブル構成の初期化
   @override
   void initState() {
@@ -46,11 +86,29 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     players = recordService.getUsersByRecordId(widget.record.id);
     // ボドゲ
     boardGame = recordService.getBoardGameByRecordId(widget.record.id);
-    // 表データ
+    // 記録データ
+    final recordItems = recordService.getRecordItemsByRecordId(widget.record.id);
+    // 表データ反映
     controllers = List.generate(
       scoringCategories.length,
-      (_) =>
-          List.generate(players.length, (_) => TextEditingController()),
+      (row) => List.generate(players.length, (col) {
+        final controller = TextEditingController();
+
+        // 該当するRecordItemを探してscoreをセット
+        final userId = players[col].id;
+        final scoringCategoryId = scoringCategories[row].id;
+
+        final item = recordItems.firstWhere(
+          (ri) =>
+              (ri.userId == userId) && (ri.scoringCategoryId == scoringCategoryId),
+        );
+
+        if (item.score != null) {
+          controller.text = item.score.toString(); // ← これが反映のポイント
+        }
+
+        return controller;
+      }),
     );
   }
 
@@ -275,9 +333,15 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
                   ),
                 ],
               ),
-            ),
+            )
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _saveScores();
+        },
+        child: const Icon(Icons.save),
+      ),
       ),
     );
   }

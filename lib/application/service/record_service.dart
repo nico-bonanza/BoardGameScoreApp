@@ -85,4 +85,13 @@ class RecordService {
 
     return boardGame;
   }
+
+  // 記録IDから、記録データを取得
+  List<RecordItem> getRecordItemsByRecordId(String recordId){
+    final recordItems = _recordItemBox.values
+        .where((item) => item.recordId == recordId)
+        .toList();
+
+    return recordItems;
+  }
 }
