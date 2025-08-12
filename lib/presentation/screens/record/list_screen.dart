@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/record.dart';
+import 'package:game_score_app/domain/models/record_item.dart';
+import 'package:game_score_app/domain/models/user.dart';
 import 'package:game_score_app/presentation/screens/record/detail_screen.dart';
 import 'package:game_score_app/presentation/screens/record/edit_screen.dart';
+import 'package:game_score_app/utils/date_utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class RecordListScreen extends StatelessWidget {
@@ -11,6 +14,8 @@ class RecordListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final box = Hive.box<Record>('records');
+    final recordItemBox = Hive.box<RecordItem>('recordItems');
+    final userBox = Hive.box<User>('users');
 
     String getBoardGameName(String? boardGameId) {
       if (boardGameId == null) return '不明なゲーム';
@@ -50,6 +55,21 @@ class RecordListScreen extends StatelessWidget {
                     getBoardGameName(record?.boardGameId),
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // プレイ日
+                      Text(formattedToday(record.createdAt)),
+                      const SizedBox(height: 4),
+                      Text(
+                        recordItemBox.values
+                            .where((item) => item.recordId == record.id)
+                                .map((item) => userBox.values.firstWhere((user)=> user.id == item.userId).name)
+                                .toSet()
+                                .join('\u0020\u0020'), // 半角スペース×2で結合
+                      ),
+                    ],
                   ),
                   // // UUID
                   // subtitle: Text('UUID: ${record?.id ?? '-'}'),
