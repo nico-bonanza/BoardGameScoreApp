@@ -105,8 +105,10 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     super.initState();
     // 得点項目
     scoringCategories = recordService.getScoringCategoriesByRecordId(widget.record.id);
-    // プレイヤー取得
-    players = recordService.getUsersByRecordId(widget.record.id);
+    // プレイヤー取得(名前で昇順)
+    players = recordService
+      .getUsersByRecordId(widget.record.id)
+      ..sort((a, b) => a.name.compareTo(b.name));
     // ボドゲ
     boardGame = recordService.getBoardGameByRecordId(widget.record.id);
     // 記録データ
