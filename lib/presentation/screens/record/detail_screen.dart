@@ -247,9 +247,6 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
               child: Table(
                 border: TableBorder.all(color: Theme.of(context).dividerColor),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                // columnWidths: const {
-                //   0: FixedColumnWidth(150),
-                // },
                 children: [
                   // ヘッダー行
                   TableRow(
@@ -272,7 +269,17 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
                         // 列：得点項目列
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(scoringCategories[row].name),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                scoringCategories[row].name,
+                                maxLines: 1,
+                                softWrap: false,
+                              ),
+                            ),
+                          ),
                         ),
                         //列： 得点（ユーザーごと）
                         for (int col = 0; col < players.length; col++)
@@ -302,9 +309,6 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
               child: Table(
                 border: TableBorder.all(color: Theme.of(context).dividerColor),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                columnWidths: const {
-                  0: FixedColumnWidth(150),
-                },
                 children: [
                   TableRow(
                     children: [
