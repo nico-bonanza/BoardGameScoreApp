@@ -39,7 +39,7 @@ class BoardGameListScreen extends StatelessWidget {
                 child: ListTile(
                   // ボドゲタイトル
                   title: Text(
-                    boardGame?.title ?? '無名',
+                    boardGame.title ?? '無名',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),

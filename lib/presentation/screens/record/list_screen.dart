@@ -40,7 +40,7 @@ class RecordListScreen extends StatelessWidget {
             itemCount: recordBox.length,
             itemBuilder: (context, index) {
               final records = recordBox.values.toList()
-                ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+                ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
               final record = records[index];
 
               return Card(

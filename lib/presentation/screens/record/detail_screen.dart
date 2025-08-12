@@ -75,6 +75,30 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     );
   }
 
+  Future<void> _createCopyRecord() async {
+    // 登録：記録
+    final record = await recordService.createRecordAndGet(boardGame);
+
+    // 登録：記録情報（ユーザー・得点項目）
+    for (var player in players) {
+      for (var sc in scoringCategories) {
+        await recordService.createRecordItem(record, sc, player);
+      }
+    }
+
+    if (!mounted) return; // context を使う前に確認
+
+    // 得点入力画面へ遷移（保存完了後）
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecordDetailScreen(
+          record: record,
+        ),
+      ),
+    );
+  }
+
 // テーブル構成の初期化
   @override
   void initState() {
@@ -170,19 +194,10 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
                 child: Text('メニュー'),
               ),
               ListTile(
-                leading: const Icon(Icons.edit_note),
-                title: const Text('表の編集'),
+                leading: const Icon(Icons.content_copy),
+                title: const Text('コピー作成'),
                 onTap: () {
-                  // Navigator.push(
-                    // context,
-                    // MaterialPageRoute(
-                    //   builder: (context) => RecordEditScreen(
-                    //     boardGame: widget.boardGame,
-                    //     date: widget.date,
-                    //     players: widget.players,
-                    //   ),
-                    // ),
-                  // );
+                  _createCopyRecord();
                 },
               ),
               ListTile(
