@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/presentation/screens/board_game_detail_screen.dart';
-import 'package:game_score_app/presentation/widgets/modals/board_game_input_modal.dart';
-import 'package:game_score_app/domain/models/board_game.dart';
+import 'package:game_score_app/presentation/screens/user/detail_screen.dart';
+import 'package:game_score_app/presentation/widgets/modals/user/input_modal.dart';
+import 'package:game_score_app/domain/models/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class BoardGameListScreen extends StatelessWidget {
-  const BoardGameListScreen({super.key});
+class UserListScreen extends StatelessWidget {
+  const UserListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final box = Hive.box<BoardGame>('boardGames');
+    final box = Hive.box<User>('users');
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // 戻るボタンを無効化
-        title: Text('ボドゲ棚'),
+        title: Text('ユーザー'),
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
-        builder: (context, Box<BoardGame> boardGameBox, _) {
-          if (boardGameBox.isEmpty) {
-            return const Center(child: Text('TANA is YOU'));
+        builder: (context, Box<User> userBox, _) {
+          // データがない場合のメイン表示
+          if (userBox.isEmpty) {
+            return const Center(child: Text('あなたは孤高のソロボーダー'));
           }
 
+          // メイン表示
           return ListView.builder(
-            itemCount: boardGameBox.length,
+            itemCount: userBox.length,
             itemBuilder: (context, index) {
-              final boardGame = boardGameBox.getAt(index);
+              final user = userBox.getAt(index);
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -36,19 +38,19 @@ class BoardGameListScreen extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    boardGame?.title ?? '無名',
+                    user?.name ?? '無名',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text('UUID: ${boardGame?.id ?? '-'}'),
-                  leading: const Icon(Icons.pentagon),
+                  subtitle: Text('UUID: ${user?.id ?? '-'}'),
+                  leading: const Icon(Icons.person),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BoardGameDetailScreen(
-                          boardGame: boardGame!,
+                        builder: (context) => UserDetailScreen(
+                          user: user!,
                         ),
                       ),
                     );
@@ -59,6 +61,8 @@ class BoardGameListScreen extends StatelessWidget {
           );
         },
       ),
+
+      // 右下プラスボタン
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // モーダル表示
@@ -68,7 +72,7 @@ class BoardGameListScreen extends StatelessWidget {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
-            builder: (context) => BoardGameInputModal(),
+            builder: (context) => UserInputModal(),
           );
         },
         child: const Icon(Icons.add),

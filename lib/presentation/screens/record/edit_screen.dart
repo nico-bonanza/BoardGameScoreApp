@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/application/service/record_service.dart';
-import 'package:game_score_app/domain/models/record.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/presentation/widgets/modals/player_select_modal.dart';
 import 'package:game_score_app/presentation/widgets/modals/scoring_category_select_modal.dart';
 import 'package:game_score_app/presentation/widgets/modals/title_select_modal.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/user.dart';
-import 'package:game_score_app/presentation/screens/record_detail_screen.dart';
+import 'package:game_score_app/presentation/screens/record/detail_screen.dart';
 import 'package:game_score_app/utils/date_utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

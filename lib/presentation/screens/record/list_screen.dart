@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/record.dart';
-import 'package:game_score_app/presentation/screens/record_detail_screen.dart';
-import 'package:game_score_app/presentation/screens/record_edit_screen.dart';
+import 'package:game_score_app/presentation/screens/record/detail_screen.dart';
+import 'package:game_score_app/presentation/screens/record/edit_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class RecordListScreen extends StatelessWidget {

@@ -18,6 +18,11 @@ class UserService {
     await _box.put(user.id, user);
   }
 
+  // 更新
+  Future<void> updateUser(User user) async {
+    await _box.put(user.id, user);
+  }
+
   // 全件取得
   List<User> getAllUsers() {
     return _box.values.toList();

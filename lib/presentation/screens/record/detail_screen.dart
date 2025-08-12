@@ -6,7 +6,6 @@ import 'package:game_score_app/domain/models/record_item.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/domain/models/user.dart';
 import 'package:game_score_app/presentation/screens/home_screen.dart';
-import 'package:game_score_app/presentation/screens/record_edit_screen.dart';
 import 'package:game_score_app/utils/date_utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -248,9 +247,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
               child: Table(
                 border: TableBorder.all(color: Theme.of(context).dividerColor),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                columnWidths: const {
-                  0: FixedColumnWidth(150),
-                },
+                // columnWidths: const {
+                //   0: FixedColumnWidth(150),
+                // },
                 children: [
                   // ヘッダー行
                   TableRow(
