@@ -24,6 +24,26 @@ class RecordListScreen extends StatelessWidget {
       return boardGame.title;
     }
 
+    String recordSummary(Record record) {
+      final recordItems =
+          recordItemBox.values.where((item) => item.recordId == record.id);
+
+      final userIds = recordItems.map((item) => item.userId).toSet();
+      final users = userIds
+          .map((id) => userBox.values.firstWhere((user) => user.id == id))
+          .toList()
+          ..sort((a, b)=> a.name.compareTo(b.name));
+
+      final usersWithScore = users.map((user) {
+        final userItems = recordItems.where((item) => item.userId == user.id);
+        var totalScore = userItems.fold<int>(0, (sum, item) => sum + (item.score ?? 0));
+
+        return '${user.name}:$totalScore';
+      });
+
+      return usersWithScore.join('\u0020\u0020');
+    }
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // 戻るボタンを無効化
@@ -62,13 +82,7 @@ class RecordListScreen extends StatelessWidget {
                       // プレイ日
                       Text(formattedToday(record.createdAt)),
                       const SizedBox(height: 4),
-                      Text(
-                        recordItemBox.values
-                            .where((item) => item.recordId == record.id)
-                                .map((item) => userBox.values.firstWhere((user)=> user.id == item.userId).name)
-                                .toSet()
-                                .join('\u0020\u0020'), // 半角スペース×2で結合
-                      ),
+                      Text(recordSummary(record)),
                     ],
                   ),
                   // // UUID
