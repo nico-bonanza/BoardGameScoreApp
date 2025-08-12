@@ -12,10 +12,16 @@ class ScoringCategory extends HiveObject {
   String boardGameId; // 外部キー：ボドゲID
   @HiveField(2)
   String name; // 項目名
+  @HiveField(3)
+  DateTime createdAt; // 作成日
+  @HiveField(4)
+  DateTime updatedAt; // 更新日
 
   ScoringCategory({
     required this.id,
     required this.boardGameId,
     required this.name,
+    required this.createdAt,
+    required this.updatedAt,
   });
 }

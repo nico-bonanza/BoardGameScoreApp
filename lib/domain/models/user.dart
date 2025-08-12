@@ -8,9 +8,17 @@ part 'user.g.dart';
 class User extends HiveObject{
   @HiveField(0)
   String id; // UUID
-
   @HiveField(1)
   String name; // ユーザー名
+  @HiveField(2)
+  DateTime createdAt; // 作成日
+  @HiveField(3)
+  DateTime updatedAt; // 更新日
 
-  User({required this.id, required this.name});
+  User({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 }

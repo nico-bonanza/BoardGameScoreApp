@@ -28,7 +28,9 @@ class UserListScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: userBox.length,
             itemBuilder: (context, index) {
-              final user = userBox.getAt(index);
+              final users = userBox.values.toList()
+                ..sort((a, b) => a.name.compareTo(b.name));
+              final user = users[index];
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -37,12 +39,14 @@ class UserListScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListTile(
+                  // ユーザー名
                   title: Text(
-                    user?.name ?? '無名',
+                    user.name,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text('UUID: ${user?.id ?? '-'}'),
+                  // // UUID
+                  // subtitle: Text('UUID: ${user?.id ?? '-'}'),
                   leading: const Icon(Icons.person),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {

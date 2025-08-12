@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
-import 'package:game_score_app/presentation/widgets/modals/scoring_category_input_model.dart';
+import 'package:game_score_app/presentation/widgets/modals/board_game/update_modal.dart';
+import 'package:game_score_app/presentation/widgets/modals/scoring_category/input_model.dart';
+import 'package:game_score_app/presentation/widgets/modals/scoring_category/update_modal.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class BoardGameDetailScreen extends StatefulWidget {
@@ -17,40 +20,141 @@ class BoardGameDetailScreen extends StatefulWidget {
 }
 
 class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
-  // 得点項目Hive
+  final Box<BoardGame> boardGameBox = Hive.box<BoardGame>('boardGames');
   final scoringCategoryBox = Hive.box<ScoringCategory>('scoringCategories');
+
+  late final ValueListenable<Box<BoardGame>> boardGameListenable;
+
+  @override
+  void initState() {
+    super.initState();
+    boardGameListenable = boardGameBox.listenable(keys: [widget.boardGame.id]);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.boardGame.title),
+        title: Text('ボドゲ詳細'),
       ),
       // 登録済みの得点項目をリスト表示。
-      body: ValueListenableBuilder( // データ監視&即反映
-        valueListenable: scoringCategoryBox.listenable(),
-        builder: (context, Box<ScoringCategory> box, _) {
-          // boardGameId で絞り込み
-          final filtered = box.values
-              .where((e) => e.boardGameId == widget.boardGame.id)
-              .toList();
+      body: Column(
+        children: [
+          // ユーザー情報部分
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(), // 最大幅制限なし
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ValueListenableBuilder<Box<BoardGame>>(
+                  valueListenable: boardGameListenable,
+                  builder: (context, box, _) {
+                    final currentBoardGame = box.get(widget.boardGame.id);
+                    if (currentBoardGame == null) {
+                      return const Center(child: Text('ボードゲームが見つかりません'));
+                    }
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.pentagon),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      currentBoardGame.title,
+                                      style: const TextStyle(fontSize: 18),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                  ),
+                                  builder: (context) =>
+                                      BoardGameUpdateModal(boardGame: currentBoardGame),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                          height: 1,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
 
-          if (filtered.isEmpty) {
-            return const Center(child: Text('得点項目がありません'));
-          }
+          // リスト部分（スクロール可能）
+          Expanded(
+            child: ValueListenableBuilder<Box<ScoringCategory>>(
+              valueListenable: scoringCategoryBox.listenable(),
+              builder: (context, box, _) {
+                final filtered = box.values
+                    .where((e) => e.boardGameId == widget.boardGame.id)
+                    .toList();
 
-          return ListView.separated(
-            itemCount: filtered.length,
-            separatorBuilder: (_, __) => const Divider(height: 0),
-            itemBuilder: (context, index) {
-              final category = filtered[index];
-              return ListTile(
-                title: Text(category.name),
-              );
-            },
-          );
-        },
+                filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+                if (filtered.isEmpty) {
+                  return const Center(child: Text('得点項目がありません'));
+                }
+
+                return ListView.separated(
+                  itemCount: filtered.length,
+                  separatorBuilder: (_, __) => const Divider(height: 0),
+                  itemBuilder: (context, index) {
+                    final category = filtered[index];
+                    return ListTile(
+                      title: Text(category.name),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            builder: (context) => ScoringCategoryUpdateModal(
+                                scoringCategory: category,
+                                scoringCategoryBox: scoringCategoryBox,
+                              ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // モーダル表示
@@ -62,6 +166,7 @@ class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
             ),
             builder: (context) => ScoringCategoryInputModel(
               boardGameId: widget.boardGame.id,
+              scoringCategoryBox: scoringCategoryBox,
             ),
           );
         },

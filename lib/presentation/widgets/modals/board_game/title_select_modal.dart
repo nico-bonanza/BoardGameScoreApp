@@ -62,6 +62,7 @@ class _TitleSelectModalState extends State<TitleSelectModal> {
                   : ListView.builder(
                       itemCount: _filteredBoardGames.length,
                       itemBuilder: (context, index) {
+                        _filteredBoardGames.sort((a, b)=> a.title.compareTo(b.title));
                         final game = _filteredBoardGames[index];
                         return ListTile(
                           title: Text(game.title),

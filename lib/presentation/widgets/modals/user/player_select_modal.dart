@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/domain/models/scoring_category.dart';
+import 'package:game_score_app/domain/models/user.dart';
 
-class ScoringCategorySelectModal extends StatefulWidget {
-  final List<ScoringCategory> allScoringCategories;
+class PlayerSelectModal extends StatefulWidget {
+  final List<User> allUsers;
 
-  const ScoringCategorySelectModal({super.key, required this.allScoringCategories});
+  const PlayerSelectModal({super.key, required this.allUsers});
 
   @override
-  State<ScoringCategorySelectModal> createState() => _ScoringCategorySelectModalState();
+  State<PlayerSelectModal> createState() => _PlayerSelectModalState();
 }
 
-class _ScoringCategorySelectModalState extends State<ScoringCategorySelectModal> {
-  late List<ScoringCategory> _filteredScoringCategories;
-  final Set<ScoringCategory> _selectedScoringCategories = {};
+class _PlayerSelectModalState extends State<PlayerSelectModal> {
+  late List<User> _filteredUsers;
+  final Set<User> _selectedUsers = {};
 
   @override
   void initState() {
     super.initState();
-    _filteredScoringCategories = widget.allScoringCategories; // 呼び出し元から渡された得点項目
+    _filteredUsers = widget.allUsers; // 呼び出し元から渡された全ユーザー
   }
 
 // 絞り込み（ひらがな・カタカナ問わず）
@@ -25,7 +25,7 @@ class _ScoringCategorySelectModalState extends State<ScoringCategorySelectModal>
     setState(() {
       final queryHiragana = _toHiragana(text.toLowerCase());
 
-      _filteredScoringCategories = widget.allScoringCategories.where((item) {
+      _filteredUsers = widget.allUsers.where((item) {
         final titleHiragana = _toHiragana(item.name.toLowerCase());
         return titleHiragana.contains(queryHiragana);
       }).toList();
@@ -41,18 +41,18 @@ class _ScoringCategorySelectModalState extends State<ScoringCategorySelectModal>
   }
 
 // ユーザー選択/選択解除
-  void _toggleScoringCategory(ScoringCategory scoringCategory) {
+  void _toggleUser(User user) {
     setState(() {
-      if (_selectedScoringCategories.contains(scoringCategory)) {
-        _selectedScoringCategories.remove(scoringCategory);
+      if (_selectedUsers.contains(user)) {
+        _selectedUsers.remove(user);
       } else {
-        _selectedScoringCategories.add(scoringCategory);
+        _selectedUsers.add(user);
       }
     });
   }
 
   void _submitSelection() {
-    Navigator.pop(context, _selectedScoringCategories.toList());
+    Navigator.pop(context, _selectedUsers.toList());
   }
 
   @override
@@ -63,39 +63,40 @@ class _ScoringCategorySelectModalState extends State<ScoringCategorySelectModal>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("得点項目を選ぶ"),
+            const Text("プレイヤーを選ぶ"),
             const SizedBox(height: 8),
             TextField(
               decoration: const InputDecoration(
-                hintText: "得点項目を検索...",
+                hintText: "ユーザーを検索...",
                 border: OutlineInputBorder(),
               ),
               onChanged: _updateQuery,
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: _filteredScoringCategories.isEmpty
-                  ? const Text("一致する得点項目が見つかりません")
+              child: _filteredUsers.isEmpty
+                  ? const Text("一致するユーザーが見つかりません")
                   : ListView.builder(
-                      itemCount: _filteredScoringCategories.length,
+                      itemCount: _filteredUsers.length,
                       itemBuilder: (context, index) {
-                        final scoringCategory = _filteredScoringCategories[index];
-                        final isSelected = _selectedScoringCategories.contains(scoringCategory);
+                        _filteredUsers.sort((a, b) => a.name.compareTo(b.name));
+                        final user = _filteredUsers[index];
+                        final isSelected = _selectedUsers.contains(user);
                         return ListTile(
-                          title: Text(scoringCategory.name),
+                          title: Text(user.name),
                           trailing: Icon(
                             isSelected
                                 ? Icons.check_box
                                 : Icons.check_box_outline_blank,
                           ),
-                          onTap: () => _toggleScoringCategory(scoringCategory),
+                          onTap: () => _toggleUser(user),
                         );
                       },
                     ),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _selectedScoringCategories.isNotEmpty ? _submitSelection : null,
+              onPressed: _selectedUsers.isNotEmpty ? _submitSelection : null,
               child: const Text('OK'),
             ),
           ],

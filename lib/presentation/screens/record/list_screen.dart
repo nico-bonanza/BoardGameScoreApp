@@ -34,7 +34,9 @@ class RecordListScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: recordBox.length,
             itemBuilder: (context, index) {
-              final record = recordBox.getAt(index);
+              final records = recordBox.values.toList()
+                ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+              final record = records[index];
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -43,12 +45,14 @@ class RecordListScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListTile(
+                  // ボドゲタイトル
                   title: Text(
                     getBoardGameName(record?.boardGameId),
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text('UUID: ${record?.id ?? '-'}'),
+                  // // UUID
+                  // subtitle: Text('UUID: ${record?.id ?? '-'}'),
                   leading: const Icon(Icons.receipt_long),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {

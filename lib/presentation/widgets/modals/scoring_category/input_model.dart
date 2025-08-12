@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/application/service/board_game_service.dart';
+import 'package:game_score_app/domain/models/scoring_category.dart';
+import 'package:game_score_app/utils/modal_utils.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ScoringCategoryInputModel extends StatefulWidget {
   final String boardGameId;
-  const ScoringCategoryInputModel({super.key, required this.boardGameId});
+  final Box<ScoringCategory> scoringCategoryBox;
+
+  const ScoringCategoryInputModel({super.key, required this.boardGameId, required this.scoringCategoryBox});
 
   @override
   State<ScoringCategoryInputModel> createState() => _ScoringCategoryInputModelState();
@@ -13,16 +18,31 @@ class _ScoringCategoryInputModelState extends State<ScoringCategoryInputModel> {
   final _scoringCategoryController = TextEditingController();
   final _service = BoardGameService();
 
+  String? _errorMessage;
+
   void _submit() async {
+    _errorMessage = null;
+
     final scoringCategory = _scoringCategoryController.text.trim();
     if (scoringCategory.isEmpty) return;
+
+    // 重複チェック
+    final exists = widget.scoringCategoryBox.values.any((e) =>
+        e.boardGameId == widget.boardGameId && // 同じボードゲーム内
+        e.name == scoringCategory);
+    if (exists) {
+      setState(() {
+        _errorMessage = '同名の項目がすでに存在します。';
+      });
+      return;
+    }
+
     await _service.registerScoringCategory(widget.boardGameId, _scoringCategoryController.text);
 
-    if (!mounted) return; // 非同期実行中に画面切り替わった際に、以下の処理を行わないようにする。
-    Navigator.pop(context); // モーダルを閉じる
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${_scoringCategoryController.text}を追加しました。')),
-    );
+    // 画面の存在確認（非同期処理の画面遷移対策）
+    if (!mounted) return;
+    // モーダルを閉じてスナックバー表示
+    closeModalWithSnackBar(context, '${_scoringCategoryController.text}を追加しました。');
   }
 
   @override
@@ -43,6 +63,13 @@ class _ScoringCategoryInputModelState extends State<ScoringCategoryInputModel> {
                 border: OutlineInputBorder(),
               ),
             ),
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ],
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _submit,

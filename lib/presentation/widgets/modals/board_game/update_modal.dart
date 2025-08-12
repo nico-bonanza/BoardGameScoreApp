@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:game_score_app/application/service/user_service.dart';
-import 'package:game_score_app/domain/models/user.dart';
+import 'package:game_score_app/application/service/board_game_service.dart';
+import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/utils/modal_utils.dart';
 
-class UserUpdateModal extends StatefulWidget {
-  final User user;
-  const UserUpdateModal({super.key, required this.user});
+class BoardGameUpdateModal extends StatefulWidget {
+  final BoardGame boardGame;
+  const BoardGameUpdateModal({super.key, required this.boardGame});
 
   @override
-  State<UserUpdateModal> createState() => _UserUpdateModalState();
+  State<BoardGameUpdateModal> createState() => _BoardGameUpdateModalState();
 }
 
-class _UserUpdateModalState extends State<UserUpdateModal> {
-  var _nameController = TextEditingController();
-  final _service = UserService();
+class _BoardGameUpdateModalState extends State<BoardGameUpdateModal> {
+  var _titleController = TextEditingController();
+  final _service = BoardGameService();
 
   void _submit() async {
-    final newName = _nameController.text.trim();
-    if (newName.isEmpty) return;
+    final newTitle = _titleController.text.trim();
+    if (newTitle.isEmpty) return;
 
-    widget.user.name = newName;
-    await _service.updateUser(widget.user);
+    widget.boardGame.title = newTitle;
+    await _service.updateBoardGame(widget.boardGame);
 
     // 画面の存在確認（非同期処理の画面遷移対策）
     if (!mounted) return;
@@ -32,13 +32,13 @@ class _UserUpdateModalState extends State<UserUpdateModal> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user.name);
+    _titleController = TextEditingController(text: widget.boardGame.title);
   }
 
   // コントローラー破棄
   @override
   void dispose() {
-    _nameController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -51,12 +51,12 @@ class _UserUpdateModalState extends State<UserUpdateModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('ユーザー名変更', style: TextStyle(fontSize: 18)),
+            const Text('タイトル変更', style: TextStyle(fontSize: 18)),
             const SizedBox(height: 12),
             TextField(
-              controller: _nameController,
+              controller: _titleController,
               decoration: const InputDecoration(
-                labelText: '名前',
+                labelText: 'タイトル',
                 border: OutlineInputBorder(),
               ),
             ),

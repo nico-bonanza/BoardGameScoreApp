@@ -20,6 +20,11 @@ class BoardGameService {
     await _box.put(game.id, game);
   }
 
+  // ボドゲ更新
+  Future<void> updateBoardGame(BoardGame boardGame) async {
+    await _box.put(boardGame.id, boardGame);
+  }
+
   // ボドゲ全件取得
   List<BoardGame> getAllGames() {
     return _box.values.toList();
@@ -31,8 +36,16 @@ class BoardGameService {
       id: _uuid.v4(),
       boardGameId: boardGameId,
       name: name,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     await _boxScoringCategory.put(category.id, category);
+  }
+
+  // 得点項目:更新
+  Future<void> updateScoringCategory(ScoringCategory scoringCategory) async {
+    scoringCategory.updatedAt = DateTime.now();
+    await _boxScoringCategory.put(scoringCategory.id, scoringCategory);
   }
 }

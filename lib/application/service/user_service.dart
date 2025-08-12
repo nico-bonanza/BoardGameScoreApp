@@ -13,6 +13,8 @@ class UserService {
     final user = User(
       id: _uuid.v4(),
       name: name,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     await _box.put(user.id, user);
@@ -20,6 +22,7 @@ class UserService {
 
   // 更新
   Future<void> updateUser(User user) async {
+    user.updatedAt = DateTime.now();
     await _box.put(user.id, user);
   }
 

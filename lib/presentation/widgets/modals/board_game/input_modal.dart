@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score_app/application/service/board_game_service.dart';
+import 'package:game_score_app/utils/modal_utils.dart';
 
 class BoardGameInputModal extends StatefulWidget {
   const BoardGameInputModal({super.key});
@@ -17,11 +18,10 @@ class _BoardGameInputModalState extends State<BoardGameInputModal> {
     if (title.isEmpty) return;
     await _service.registerBoardGame(_titleController.text);
 
-    if (!mounted) return; // 非同期実行中に画面切り替わった際に、以下の処理を行わないようにする。
-    Navigator.pop(context); // モーダルを閉じる
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${_titleController.text}を追加しました。')),
-    );
+    // 画面の存在確認（非同期処理の画面遷移対策）
+    if (!mounted) return;
+    // モーダルを閉じてスナックバー表示
+    closeModalWithSnackBar(context, '${_titleController.text}を追加しました。');
   }
 
   @override
