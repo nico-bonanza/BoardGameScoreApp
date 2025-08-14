@@ -12,39 +12,65 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  late final PageController _pageController;
 
-  // ボトムナビゲータの画面配列
   final List<Widget> _screens = [
-    RecordListScreen(), // プレイ記録
-    BoardGameListScreen(), // ボドゲ棚
-    UserListScreen(), // ユーザー
+    RecordListScreen(),
+    BoardGameListScreen(),
+    UserListScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: PageView(
+        controller: _pageController,
+        children: _screens,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (int index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long),
-              label: 'プレイ記録',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shelves),
-              label: 'ボドゲ棚',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people_alt),
-              label: 'ユーザー',
-            ),
-          ]),
+        currentIndex: _currentIndex,
+        onTap: (int index) {
+          setState(() {
+            _currentIndex = index;
+            _pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long),
+            label: 'プレイ記録',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shelves),
+            label: 'ボドゲ棚',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_alt),
+            label: 'ユーザー',
+          ),
+        ],
+      ),
     );
   }
 }
