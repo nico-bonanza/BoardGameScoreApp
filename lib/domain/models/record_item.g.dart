@@ -24,13 +24,14 @@ class RecordItemAdapter extends TypeAdapter<RecordItem> {
       score: fields[4] as int?,
       createdAt: fields[5] as DateTime,
       updatedAt: fields[6] as DateTime,
+      rowNumber: fields[7] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, RecordItem obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class RecordItemAdapter extends TypeAdapter<RecordItem> {
       ..writeByte(5)
       ..write(obj.createdAt)
       ..writeByte(6)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.rowNumber);
   }
 
   @override

@@ -88,10 +88,13 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     final record = await recordService.createRecordAndGet(boardGame);
 
     // 登録：記録情報（ユーザー・得点項目）
+    var rowNumber = 0; // 項目の表示順
     for (var player in players) {
       for (var sc in scoringCategories) {
-        await recordService.createRecordItem(record, sc, player);
+        await recordService.createRecordItem(record, sc, player, rowNumber);
+        rowNumber++;
       }
+      rowNumber = 0;
     }
 
     if (!mounted) return; // context を使う前に確認
@@ -137,9 +140,8 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
         );
 
         if (item.score != null) {
-          controller.text = item.score.toString(); // ← これが反映のポイント
+          controller.text = item.score.toString();
         }
-
 
         // 変更監視を追加
         controller.addListener(() {

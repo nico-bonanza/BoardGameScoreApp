@@ -159,10 +159,13 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
     final record = await _recordService.createRecordAndGet(selectedBoardGame!);
 
     // 登録：記録情報（ユーザー・得点項目）
+    var rowNumber = 0; // 項目の表示順
     for (var player in selectedPlayers) {
       for (var sc in selectedScoringCategories) {
-        await _recordService.createRecordItem(record, sc, player);
+        await _recordService.createRecordItem(record, sc, player, rowNumber);
+        rowNumber++;
       }
+      rowNumber = 0;
     }
 
     if (!mounted) return; // context を使う前に確認

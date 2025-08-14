@@ -32,7 +32,7 @@ class RecordService {
   }
 
   // 登録：記録-得点項目-ユーザ
-  createRecordItem(Record record, ScoringCategory scoringCategory, User user) async {
+  createRecordItem(Record record, ScoringCategory scoringCategory, User user, int rowNumber) async {
     final recordItem = RecordItem(
       id: _uuid.v4(),
       recordId: record.id,
@@ -41,24 +41,32 @@ class RecordService {
       score: null,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      rowNumber: rowNumber
     );
 
     await _recordItemBox.put(recordItem.id, recordItem);
   }
 
   // 記録IDから、設定された得点項目を取得
-  List<ScoringCategory> getScoringCategoriesByRecordId(String recordId){
-      final scoringCategoryIds = _recordItemBox.values
-          .where((item) => item.recordId == recordId)
-          .map((item) => item.scoringCategoryId)
-          .toList();
+  List<ScoringCategory> getScoringCategoriesByRecordId(String recordId) {
+    // recordId に紐づく RecordItem を rowNumber 昇順で取得
+    final recordItems = _recordItemBox.values
+        .where((item) => item.recordId == recordId)
+        .toList()
+        ..sort((a, b) => a.rowNumber!.compareTo(b.rowNumber!));
 
-      final scoringCategories = _scoringCategoryBox.values
-          .where((sc)=>scoringCategoryIds
-          .contains(sc.id))
-          .toList();
+    // 重複を排除しつつ、RecordItem の順序を保った scoringCategoryId のリスト
+    final scoringCategoryIds =
+        recordItems.map((item) => item.scoringCategoryId).toSet().toList();
 
-      return scoringCategories;
+    // scoringCategoryIds の順序に従って ScoringCategory を取得
+    final scoringCategories = scoringCategoryIds
+        .map(
+          (id) => _scoringCategoryBox.values.firstWhere((sc) => sc.id == id),
+        )
+        .toList();
+
+    return scoringCategories;
   }
 
   // 記録IDから、設定されたユーザーを取得

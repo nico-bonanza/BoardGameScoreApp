@@ -20,6 +20,8 @@ class RecordItem extends HiveObject {
   DateTime createdAt; // 作成日
   @HiveField(6)
   DateTime updatedAt; // 更新日
+  @HiveField(7)
+  int? rowNumber; // 項目順
 
   RecordItem({
     required this.id,
@@ -29,5 +31,6 @@ class RecordItem extends HiveObject {
     this.score,
     required this.createdAt,
     required this.updatedAt,
+    this.rowNumber,
   });
 }
