@@ -27,6 +27,8 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   late final List<ScoringCategory> scoringCategories;
   // 2次元のコントローラー：rows x cols
   late final List<List<TextEditingController>> controllers;
+  // 変更があったかどうかを記録するフラグ
+  bool hasChanges = false;
 
 // 得点合計の計算
   int _calculateColumnTotal(int col) {
@@ -39,6 +41,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   }
 
   Future<void> _saveScores() async {
+    // 変更がなければ保存しない。
+    if(hasChanges == false) return;
+
     for (int row = 0; row < scoringCategories.length; row++) {
       final scoringCategoryId = scoringCategories[row].id;
 
@@ -67,6 +72,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
         await recordItem.save();
       }
     }
+
+    // 変更有無の監視を初期化
+    hasChanges = false;
 
     if (!mounted) return; // context を使う前に確認
 
@@ -132,6 +140,12 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
           controller.text = item.score.toString(); // ← これが反映のポイント
         }
 
+
+        // 変更監視を追加
+        controller.addListener(() {
+          hasChanges = true;
+        });
+
         return controller;
       }),
     );
@@ -150,10 +164,16 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope( // 「戻る」機能を制御
+    return PopScope( // 物理的「戻る」機能を制御
       canPop: false, // デフォルトで「戻れない」
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) async {
+        // 記録保存
+        await _saveScores();
+
         if (didPop) return; // システム側で戻り済なら何もしない
+
+        // 画面の存在確認（非同期処理の画面遷移対策）
+        if (!context.mounted) return;
 
         // カスタム戻る処理（例：HomeScreenに戻る）
         Navigator.pushAndRemoveUntil(
@@ -164,8 +184,15 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          // 左上戻る矢印ボタン制御
           leading: BackButton(
-            onPressed: () {
+            onPressed: () async {
+              // 記録保存
+              await _saveScores();
+
+              // 画面の存在確認（非同期処理の画面遷移対策）
+              if (!context.mounted) return;
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
