@@ -21,7 +21,10 @@ class RecordDetailScreen extends StatefulWidget {
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> {
   final _recordItemBox = Hive.box<RecordItem>('recordItems');
+  final _recordBox = Hive.box<Record>('records');
+
   final recordService = RecordService();
+
   late final BoardGame boardGame;
   late final List<User> players;
   late final List<ScoringCategory> scoringCategories;
@@ -29,6 +32,8 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   late final List<List<TextEditingController>> controllers;
   // 変更があったかどうかを記録するフラグ
   bool hasChanges = false;
+  // 項目データ
+  late final List<RecordItem> recordItems;
 
 // 得点合計の計算
   int _calculateColumnTotal(int col) {
@@ -83,6 +88,48 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     );
   }
 
+  Future<void> _deleteDetail() async {
+    // 削除前に確認ダイアログを表示
+    final bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('削除の確認'),
+          content: const Text('本当にこの記録を削除しますか？'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('キャンセル'),
+              onPressed: () =>
+                  Navigator.of(context).pop(false), // キャンセルでfalseを返す
+            ),
+            TextButton(
+              child: const Text('削除'),
+              onPressed: () => Navigator.of(context).pop(true), // 削除でtrueを返す
+            ),
+          ],
+        );
+      },
+    );
+
+    // ダイアログで「削除」が押された場合のみ、削除処理を実行
+    if (shouldDelete == true) {
+      // 項目削除
+      await _recordItemBox.deleteAll(recordItems.map((e) => e.key));
+      // 記録削除
+      await _recordBox.delete(widget.record.id);
+
+      // 画面の存在確認（非同期処理の画面遷移対策）
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    }
+  }
+
   Future<void> _createCopyRecord() async {
     // 登録：記録
     final record = await recordService.createRecordAndGet(boardGame);
@@ -123,7 +170,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     // ボドゲ
     boardGame = recordService.getBoardGameByRecordId(widget.record.id);
     // 記録データ
-    final recordItems = recordService.getRecordItemsByRecordId(widget.record.id);
+    recordItems = recordService.getRecordItemsByRecordId(widget.record.id);
     // 表データ反映
     controllers = List.generate(
       scoringCategories.length,
@@ -243,6 +290,13 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
                 title: const Text('なにか'),
                 onTap: () {
                   // ヘルプ画面
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('削除'),
+                onTap: () {
+                  _deleteDetail();
                 },
               ),
             ],
