@@ -3,6 +3,7 @@ import 'package:game_score_app/application/service/board_game_service.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/utils/modal_utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:collection/collection.dart';
 
 class ScoringCategoryInputModel extends StatefulWidget {
   final String boardGameId;
@@ -26,18 +27,30 @@ class _ScoringCategoryInputModelState extends State<ScoringCategoryInputModel> {
     final scoringCategory = _scoringCategoryController.text.trim();
     if (scoringCategory.isEmpty) return;
 
-    // 重複チェック
-    final exists = widget.scoringCategoryBox.values.any((e) =>
+    // 同名項目取得
+    final existItem = widget.scoringCategoryBox.values.firstWhereOrNull((e) =>
         e.boardGameId == widget.boardGameId && // 同じボードゲーム内
         e.name == scoringCategory);
-    if (exists) {
-      setState(() {
-        _errorMessage = '同名の項目がすでに存在します。';
-      });
-      return;
-    }
 
-    await _service.registerScoringCategory(widget.boardGameId, _scoringCategoryController.text);
+    // 存在する場合
+    if (existItem != null) {
+      // 有効データなら、重複エラーメッセージ
+      if (existItem.isDelete == false) {
+        setState(() {
+          _errorMessage = '同名の項目がすでに存在します。';
+        });
+        return;
+      }
+      // 無効データなら、再有効化
+      else {
+        existItem.isDelete = false;
+        existItem.createdAt = DateTime.now();
+        await existItem.save();
+      }
+    } else {
+      // 新規保作成
+      await _service.registerScoringCategory(widget.boardGameId, _scoringCategoryController.text);
+    }
 
     // 画面の存在確認（非同期処理の画面遷移対策）
     if (!mounted) return;

@@ -19,7 +19,7 @@ class RecordDetailScreen extends StatefulWidget {
   State<RecordDetailScreen> createState() => _RecordDetailScreenState();
 }
 
-class _RecordDetailScreenState extends State<RecordDetailScreen> {
+class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBindingObserver {
   final _recordItemBox = Hive.box<RecordItem>('recordItems');
   final _recordBox = Hive.box<Record>('records');
 
@@ -161,6 +161,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   @override
   void initState() {
     super.initState();
+    // ライフサイクル監視
+    WidgetsBinding.instance.addObserver(this);
+
     // 得点項目
     scoringCategories = recordService.getScoringCategoriesByRecordId(widget.record.id);
     // プレイヤー取得(名前で昇順)
@@ -203,12 +206,27 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   // 画面切り替え時のメモリリーク
   @override
   void dispose() {
+    // ライフサイクル監視
+    WidgetsBinding.instance.removeObserver(this);
+    // 得点入力コントローラー
     for (var row in controllers) {
       for (var ctrl in row) {
         ctrl.dispose();
       }
     }
     super.dispose();
+  }
+
+  // ライフサイクルの変更を検知
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      // ホームボタン押下や画面切り替えで一時停止時
+      _saveScores();
+    }
   }
 
   @override

@@ -72,7 +72,7 @@ class RecordListScreen extends StatelessWidget {
                 child: ListTile(
                   // ボドゲタイトル
                   title: Text(
-                    getBoardGameName(record?.boardGameId),
+                    getBoardGameName(record.boardGameId),
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -87,7 +87,7 @@ class RecordListScreen extends StatelessWidget {
                   ),
                   // // UUID
                   // subtitle: Text('UUID: ${record?.id ?? '-'}'),
-                  leading: const Icon(Icons.receipt_long),
+                  // leading: const Icon(Icons.receipt_long),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(

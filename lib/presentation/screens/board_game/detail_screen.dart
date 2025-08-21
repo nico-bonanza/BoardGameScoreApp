@@ -25,6 +25,38 @@ class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
 
   late final ValueListenable<Box<BoardGame>> boardGameListenable;
 
+  // 項目削除
+    Future<void> _deleteCategory(ScoringCategory category) async {
+    // 削除前に確認ダイアログを表示
+    final bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('削除の確認'),
+          content: const Text('本当にこの項目を削除しますか？'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('キャンセル'),
+              onPressed: () =>
+                  Navigator.of(context).pop(false), // キャンセルでfalseを返す
+            ),
+            TextButton(
+              child: const Text('削除'),
+              onPressed: () => Navigator.of(context).pop(true), // 削除でtrueを返す
+            ),
+          ],
+        );
+      },
+    );
+
+    // ダイアログで「削除」が押された場合のみ、削除処理を実行
+    if (shouldDelete == true) {
+      // 論理削除
+      category.isDelete = true;
+      await category.save();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -113,6 +145,7 @@ class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
               builder: (context, box, _) {
                 final filtered = box.values
                     .where((e) => e.boardGameId == widget.boardGame.id)
+                    .where((e) => e.isDelete == false)
                     .toList();
 
                 filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -128,23 +161,37 @@ class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
                     final category = filtered[index];
                     return ListTile(
                       title: Text(category.name),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16),
-                              ),
-                            ),
-                            builder: (context) => ScoringCategoryUpdateModal(
-                                scoringCategory: category,
-                                scoringCategoryBox: scoringCategoryBox,
-                              ),
-                          );
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            // tooltip: '詳細',
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              _deleteCategory(category);
+                            },
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            // tooltip: '編集',
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16)),
+                                ),
+                                builder: (context) =>
+                                    ScoringCategoryUpdateModal(
+                                  scoringCategory: category,
+                                  scoringCategoryBox: scoringCategoryBox,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     );
                   },

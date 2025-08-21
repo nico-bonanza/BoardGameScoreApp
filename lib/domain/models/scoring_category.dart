@@ -16,6 +16,8 @@ class ScoringCategory extends HiveObject {
   DateTime createdAt; // 作成日
   @HiveField(4)
   DateTime updatedAt; // 更新日
+  @HiveField(5)
+  bool isDelete; // 削除フラグ
 
   ScoringCategory({
     required this.id,
@@ -23,5 +25,6 @@ class ScoringCategory extends HiveObject {
     required this.name,
     required this.createdAt,
     required this.updatedAt,
-  });
+    bool? isDelete = false, // 初期値はfalse
+  }) : isDelete = isDelete ?? false;
 }
