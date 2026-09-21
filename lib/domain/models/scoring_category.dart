@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:game_score_app/domain/models/hive_type_ids.dart';
 import 'package:hive/hive.dart';
 
@@ -27,4 +28,15 @@ class ScoringCategory extends HiveObject {
     required this.updatedAt,
     bool? isDelete = false, // 初期値はfalse
   }) : isDelete = isDelete ?? false;
+
+  // firestoreへの変換map
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'boardGameId': boardGameId,
+      'name': name,
+      'isDelete': isDelete,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
 }

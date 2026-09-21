@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'hive_type_ids.dart';
 
@@ -24,4 +25,13 @@ class Record extends HiveObject {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  // firestoreへの変換map
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'boardGameId': boardGameId,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
 }

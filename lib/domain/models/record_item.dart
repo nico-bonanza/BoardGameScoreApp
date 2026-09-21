@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:game_score_app/domain/models/hive_type_ids.dart';
 import 'package:hive/hive.dart';
 
@@ -33,4 +34,16 @@ class RecordItem extends HiveObject {
     required this.updatedAt,
     this.rowNumber,
   });
+
+  // firestoreへの変換map
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'userId': userId,
+      'scoringCategoryId': scoringCategoryId,
+      'score': score,
+      'rowNumber': rowNumber,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
 }

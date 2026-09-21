@@ -13,4 +13,11 @@ class BoardGame extends HiveObject{
   String title; // タイトル名
 
   BoardGame({required this.id, required this.title});
+
+  // firestoreへの変換map
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'title': title,
+    };
+  }
 }

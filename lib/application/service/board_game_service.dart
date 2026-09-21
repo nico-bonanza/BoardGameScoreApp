@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
@@ -18,11 +19,23 @@ class BoardGameService {
     );
 
     await _box.put(game.id, game);
+
+    // Firestoreへの書き込み
+    await FirebaseFirestore.instance
+        .collection('boardGames')
+        .doc(game.id)
+        .set(game.toFirestoreMap());
   }
 
   // ボドゲ更新
   Future<void> updateBoardGame(BoardGame boardGame) async {
     await _box.put(boardGame.id, boardGame);
+
+    // Firestoreへの書き込み
+    await FirebaseFirestore.instance
+        .collection('boardGames')
+        .doc(boardGame.id)
+        .set(boardGame.toFirestoreMap(), SetOptions(merge: true));
   }
 
   // ボドゲ全件取得
@@ -41,11 +54,23 @@ class BoardGameService {
     );
 
     await _boxScoringCategory.put(category.id, category);
+
+    // Firestoreへの書き込み
+    await FirebaseFirestore.instance
+        .collection('scoringCategories')
+        .doc(category.id)
+        .set(category.toFirestoreMap());
   }
 
   // 得点項目:更新
   Future<void> updateScoringCategory(ScoringCategory scoringCategory) async {
     scoringCategory.updatedAt = DateTime.now();
     await _boxScoringCategory.put(scoringCategory.id, scoringCategory);
+
+    // Firestoreへの書き込み
+    await FirebaseFirestore.instance
+        .collection('scoringCategories')
+        .doc(scoringCategory.id)
+        .set(scoringCategory.toFirestoreMap(), SetOptions(merge: true)); // 渡されたフィールドだけ更新
   }
 }

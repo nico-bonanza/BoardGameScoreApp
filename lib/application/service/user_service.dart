@@ -32,6 +32,12 @@ class UserService {
   Future<void> updateUser(User user) async {
     user.updatedAt = DateTime.now();
     await _box.put(user.id, user);
+
+    // Firestoreへの書き込み
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .set(user.toFirestoreMap(), SetOptions(merge: true));
   }
 
   // 全件取得

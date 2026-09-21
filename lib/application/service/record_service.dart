@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:game_score_app/domain/models/record.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/domain/models/user.dart';
@@ -28,6 +29,13 @@ class RecordService {
     );
 
     await _recordBox.put(record.id, record);
+
+    // firestoreへの保存
+    await FirebaseFirestore.instance
+        .collection('records')
+        .doc(record.id)
+        .set(record.toFirestoreMap());
+
     return record;
   }
 
@@ -45,6 +53,14 @@ class RecordService {
     );
 
     await _recordItemBox.put(recordItem.id, recordItem);
+
+    // firestoreへの保存
+    await FirebaseFirestore.instance
+        .collection('records')
+        .doc(record.id)
+        .collection('recordItems')
+        .doc(recordItem.id)
+        .set(recordItem.toFirestoreMap());
   }
 
   // 記録IDから、設定された得点項目を取得
