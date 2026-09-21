@@ -8,10 +8,17 @@ import 'package:game_score_app/domain/models/record_item.dart';
 import 'package:game_score_app/presentation/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   // flutter初期化
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase初期化
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Hive初期化
   await Hive.initFlutter();
