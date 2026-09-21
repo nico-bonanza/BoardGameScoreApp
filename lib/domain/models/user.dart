@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'hive_type_ids.dart';
 
@@ -5,7 +6,7 @@ part 'user.g.dart';
 
 // ユーザー
 @HiveType(typeId: HiveTypeIds.user)
-class User extends HiveObject{
+class User extends HiveObject {
   @HiveField(0)
   String id; // UUID
   @HiveField(1)
@@ -21,4 +22,13 @@ class User extends HiveObject{
     required this.createdAt,
     required this.updatedAt,
   });
+
+  // firestoreへの変換map
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'name': name,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
 }

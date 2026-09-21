@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:game_score_app/domain/models/user.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
@@ -17,7 +18,14 @@ class UserService {
       updatedAt: DateTime.now(),
     );
 
+    // DBへの書き込み
     await _box.put(user.id, user);
+
+    // Firestoreへの書き込み
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .set(user.toFirestoreMap());
   }
 
   // 更新
