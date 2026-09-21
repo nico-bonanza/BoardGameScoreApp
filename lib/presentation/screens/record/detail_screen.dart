@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score_app/application/service/record_service.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
@@ -75,6 +76,14 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
 
         // 更新保存
         await recordItem.save();
+
+        // firestoreへの保存
+        await FirebaseFirestore.instance
+            .collection('records')
+            .doc(widget.record.id)
+            .collection('recordItems')
+            .doc(recordItem.id)
+            .set(recordItem.toFirestoreMap());
       }
     }
 
