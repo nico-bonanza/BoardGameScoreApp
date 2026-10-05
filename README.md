@@ -60,7 +60,13 @@ records/{recordId}/recordItems (サブコレクション)
 
 ## スクリーンショット
 
-<!-- 画面イメージをここに追加 -->
+<img width="514" height="568" alt="スクリーンショット 2026-10-05 23 48 29" src="https://github.com/user-attachments/assets/8c10af8c-91db-414f-9022-951397e8beb8" />
+<img width="511" height="677" alt="スクリーンショット 2026-10-05 23 48 21" src="https://github.com/user-attachments/assets/215841e8-c300-4a5b-bab0-144386c0ab59" />
+<img width="309" height="246" alt="スクリーンショット 2026-10-05 23 48 04" src="https://github.com/user-attachments/assets/abb9710b-fd18-43f9-80f4-45d32ba4b610" />
+<img width="511" height="676" alt="スクリーンショット 2026-10-05 23 47 49" src="https://github.com/user-attachments/assets/4214dcf9-efba-4794-9795-4b23047ccb3b" />
+<img width="517" height="676" alt="スクリーンショット 2026-10-05 23 47 40" src="https://github.com/user-attachments/assets/3b7adc15-5e3f-44d7-94a7-f4a8f204cccd" />
+<img width="519" height="683" alt="スクリーンショット 2026-10-05 23 47 22" src="https://github.com/user-attachments/assets/1ef38b1c-c627-452c-a280-cf8a127314fd" />
+
 
 ## 開発環境
 
