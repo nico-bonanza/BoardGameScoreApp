@@ -1,16 +1,73 @@
-# game_score_app
+# game_score_app (BG6)
 
-A new Flutter project.
+ボードゲームの得点記録・集計アプリ。
+シンプルな操作で、ゲームごとの得点項目に沿った集計表を作成・記録します。
 
-## Getting Started
+## 開発の背景
 
-This project is a starting point for a Flutter application.
+ボードゲームの得点計算は、ゲームごとに異なる複数の得点項目を紙に書き出し、最後に手計算で合計するのが一般的です。これは手間がかかるうえに計算ミスも起きやすく、かといって麻雀の点数帳簿のような汎用フォーマットでは対応できないため、Excelのような集計ソフトで表を作成するのは煩雑でした。
 
-A few resources to get you started if this is your first Flutter project:
+そこで、ボードゲームとその得点項目をあらかじめ登録しておき、プレイのたびにゲームを選んで得点を入力するだけで集計表が作成されるアプリを作りました。
+Web版だと常時オンラインであることが前提になってしまうため、まずはオフラインでも完結するネイティブアプリとして開発し、DBもローカル完結(Hive)にしました。
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+半年ほど実際に使用した結果、
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- スマホの画面が小さく、複数人で覗き込みながら見るには不向き
+- 集計結果だけが見られても味気なく、入力中の途中経過もみんなで共有したい
+
+という課題が出てきたため、Firestoreとの連携機能を追加し、閲覧専用のWeb版(React)を別途開発・デプロイしています。
+
+## 主な機能
+
+- プレイヤー登録
+- ボードゲーム登録、ゲームごとの得点項目登録
+- ゲーム記録(プレイセッション)の作成・編集
+- 記録したデータのFirestoreへの同期(Web版での閲覧用)
+
+## 技術スタック
+
+- **フレームワーク**: Flutter (Dart)
+- **ローカルDB**: Hive
+- **クラウドDB**: Cloud Firestore
+
+関連リポジトリ: 閲覧用Web版(React + Firestore) ※別リポジトリ
+
+## アーキテクチャ・設計判断
+
+### ローカルDB(Hive)とクラウドDB(Firestore)の二重構成
+
+オフライン完結を維持しつつ共有機能を足すため、「ローカル保存は従来通りHive、保存と同時にFirestoreにも書き込む」という構成にしました。これにより、既存のアプリの挙動(オフラインで完結する記録アプリ)を変えずに、共有機能だけを追加できます。
+
+### Firestoreのコレクション設計
+
+ローカルのHiveモデル(User / BoardGame / ScoringCategory / Record / RecordItem)をベースに、以下の構成でFirestoreへマッピングしています。
+
+```
+users, boardGames, scoringCategories, records (すべてトップレベルコレクション)
+records/{recordId}/recordItems (サブコレクション)
+```
+
+`recordItems`をサブコレクションにしているのは、「ある記録の得点一覧」を1回のクエリ(リアルタイムリスナー)でまとめて取得できるようにするためです。
+
+## データ構造上の工夫と課題
+
+将来的に「プレイヤーごと・ボードゲームごとの勝率」のような分析機能を見据え、得点データを `ボードゲーム → 得点項目 → ユーザー → 得点` という形で正規化して保持する設計にしています。この構造により分析の拡張性は確保できましたが、一方で単純な一覧表示であっても「行(得点項目)×列(プレイヤー)」のピボット表に組み替える処理が必要になり、表示側のロジックがやや複雑になっています。この分析機能(勝率の算出など)は未実装のため、今後の課題です。
+
+## 今後の展望
+
+- Web版(閲覧用)のパフォーマンス改善
+- Go(学習目的)を用いたバックエンドAPIの追加、記録データの分析機能(勝率など)の実装
+
+## スクリーンショット
+
+<!-- 画面イメージをここに追加 -->
+
+## 開発環境
+
+```bash
+flutter pub get
+flutterfire configure  # 自身のFirebaseプロジェクトに接続する場合
+flutter run
+```
+
+※ `android/app/google-services.json` は本リポジトリに含まれていません。`flutterfire configure` で生成する想定です。
