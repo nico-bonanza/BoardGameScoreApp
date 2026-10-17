@@ -8,6 +8,7 @@ import 'package:game_score_app/domain/models/record_item.dart';
 import 'package:game_score_app/presentation/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -19,6 +20,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // 匿名ログイン（Firestoreのルールで書き込み元をこのアプリに限定するため）
+  // 一度ログインすれば端末に保持され、次回以降は同じユーザーIDになる
+  final auth = FirebaseAuth.instance;
+  final currentUser = await auth.authStateChanges().first;
+  if (currentUser == null) {
+    try {
+      await auth.signInAnonymously();
+    } catch (e) {
+      // オフライン等で失敗してもアプリ自体は起動させる（次回起動時に再試行）
+      debugPrint('匿名ログインに失敗しました: $e');
+    }
+  }
 
   // Hive初期化
   await Hive.initFlutter();
