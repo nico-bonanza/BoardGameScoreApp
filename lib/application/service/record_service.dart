@@ -17,50 +17,52 @@ class RecordService {
   final _boardGameBox = Hive.box<BoardGame>('BoardGames');
   final Uuid _uuid = Uuid();
 
-  // 登録：記録
-  Future<Record> createRecordAndGet(BoardGame boardGame) async {
-    final String recordId = _uuid.v4();
+  // 登録：記録と記録情報（ユーザー×得点項目）をまとめて作成
+  // firestoreへは1回のバッチ書き込みで保存する（1件ずつ書くと件数分の通信待ちが発生するため）
+  Future<Record> createRecordWithItems(
+      BoardGame boardGame, List<User> players, List<ScoringCategory> scoringCategories) async {
+    final now = DateTime.now();
     final record = Record(
-      id: recordId,
+      id: _uuid.v4(),
       boardGameId: boardGame.id,
       isSynced: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
     );
 
-    await _recordBox.put(record.id, record);
+    final recordItems = <RecordItem>[];
+    for (var player in players) {
+      var rowNumber = 0; // 項目の表示順
+      for (var sc in scoringCategories) {
+        recordItems.add(RecordItem(
+          id: _uuid.v4(),
+          recordId: record.id,
+          userId: player.id,
+          scoringCategoryId: sc.id,
+          score: null,
+          createdAt: now,
+          updatedAt: now,
+          rowNumber: rowNumber,
+        ));
+        rowNumber++;
+      }
+    }
 
-    // firestoreへの保存
-    await FirebaseFirestore.instance
-        .collection('records')
-        .doc(record.id)
-        .set(record.toFirestoreMap());
+    // 端末への保存
+    await _recordBox.put(record.id, record);
+    await _recordItemBox.putAll({for (var item in recordItems) item.id: item});
+
+    // firestoreへの保存（バッチ1件あたり最大500書き込み）
+    final firestore = FirebaseFirestore.instance;
+    final recordRef = firestore.collection('records').doc(record.id);
+    final batch = firestore.batch();
+    batch.set(recordRef, record.toFirestoreMap());
+    for (var item in recordItems) {
+      batch.set(recordRef.collection('recordItems').doc(item.id), item.toFirestoreMap());
+    }
+    await batch.commit();
 
     return record;
-  }
-
-  // 登録：記録-得点項目-ユーザ
-  createRecordItem(Record record, ScoringCategory scoringCategory, User user, int rowNumber) async {
-    final recordItem = RecordItem(
-      id: _uuid.v4(),
-      recordId: record.id,
-      userId: user.id,
-      scoringCategoryId: scoringCategory.id,
-      score: null,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      rowNumber: rowNumber
-    );
-
-    await _recordItemBox.put(recordItem.id, recordItem);
-
-    // firestoreへの保存
-    await FirebaseFirestore.instance
-        .collection('records')
-        .doc(record.id)
-        .collection('recordItems')
-        .doc(recordItem.id)
-        .set(recordItem.toFirestoreMap());
   }
 
   // 記録IDから、設定された得点項目を取得

@@ -5,6 +5,7 @@ import 'package:game_score_app/presentation/widgets/modals/user/player_select_mo
 import 'package:game_score_app/presentation/widgets/modals/scoring_category/select_modal.dart';
 import 'package:game_score_app/presentation/widgets/modals/board_game/title_select_modal.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
+import 'package:game_score_app/domain/models/record.dart';
 import 'package:game_score_app/domain/models/user.dart';
 import 'package:game_score_app/presentation/screens/record/detail_screen.dart';
 import 'package:game_score_app/utils/date_utils.dart';
@@ -30,6 +31,8 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
   late DateTime selectedDate; // 初期作成日
   late List<User> selectedPlayers;
   late List<ScoringCategory> selectedScoringCategories;
+  // 保存処理中（スピナー表示・二重保存防止）
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -132,6 +135,8 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
   }
 
   Future<void> _onPressedSaveIcon() async {
+    if (_isSaving) return; // 保存中の再タップは無視
+
     List<String> messages = [];
 
     if (selectedBoardGame == null) {
@@ -155,17 +160,22 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
       return; // 保存処理に進まない
     }
 
-    // 登録：記録
-    final record = await _recordService.createRecordAndGet(selectedBoardGame!);
+    // 保存中はスピナーを表示
+    setState(() {
+      _isSaving = true;
+    });
 
-    // 登録：記録情報（ユーザー・得点項目）
-    var rowNumber = 0; // 項目の表示順
-    for (var player in selectedPlayers) {
-      for (var sc in selectedScoringCategories) {
-        await _recordService.createRecordItem(record, sc, player, rowNumber);
-        rowNumber++;
+    final Record record;
+    try {
+      // 登録：記録・記録情報（ユーザー・得点項目）
+      record = await _recordService.createRecordWithItems(
+          selectedBoardGame!, selectedPlayers, selectedScoringCategories);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
       }
-      rowNumber = 0;
     }
 
     if (!mounted) return; // context を使う前に確認
@@ -184,15 +194,18 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
+    return PopScope(
+      canPop: !_isSaving, // 保存中は戻れない
+      child: Stack(
+        children: [
+          Scaffold(
         appBar: AppBar(
           title: const Text("プレイ記録編集"),
           actions: [
             IconButton(
                 icon: Icon(Icons.save),
-                onPressed: () {
-                  _onPressedSaveIcon();
-                },
+                // 保存中は押せない
+                onPressed: _isSaving ? null : _onPressedSaveIcon,
               ),
           ],
         ),
@@ -350,6 +363,26 @@ class _RecordEditScreenState extends State<RecordEditScreen> {
                         .map((scoringCategory) => Text(scoringCategory.name))
                         .toList(),
                   )
-                ]))));
+                ])))),
+          // 保存中オーバーレイ（操作をブロックしてスピナー表示）
+          if (_isSaving) ...[
+            const ModalBarrier(dismissible: false, color: Colors.black54),
+            const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    '保存中...',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }

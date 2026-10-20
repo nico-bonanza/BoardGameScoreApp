@@ -146,18 +146,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
   }
 
   Future<void> _createCopyRecord() async {
-    // 登録：記録
-    final record = await recordService.createRecordAndGet(boardGame);
-
-    // 登録：記録情報（ユーザー・得点項目）
-    var rowNumber = 0; // 項目の表示順
-    for (var player in players) {
-      for (var sc in scoringCategories) {
-        await recordService.createRecordItem(record, sc, player, rowNumber);
-        rowNumber++;
-      }
-      rowNumber = 0;
-    }
+    // 登録：記録・記録情報（ユーザー・得点項目）
+    final record = await recordService.createRecordWithItems(
+        boardGame, players, scoringCategories);
 
     if (!mounted) return; // context を使う前に確認
 
