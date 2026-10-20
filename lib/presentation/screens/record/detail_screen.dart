@@ -22,7 +22,6 @@ class RecordDetailScreen extends StatefulWidget {
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBindingObserver {
   final _recordItemBox = Hive.box<RecordItem>('recordItems');
-  final _recordBox = Hive.box<Record>('records');
 
   final recordService = RecordService();
 
@@ -31,8 +30,8 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
   late final List<ScoringCategory> scoringCategories;
   // 2次元のコントローラー：rows x cols
   late final List<List<TextEditingController>> controllers;
-  // 変更があったかどうかを記録するフラグ
-  bool hasChanges = false;
+  // 2次元のフォーカス：rows x cols（カーソルが外れたら保存）
+  late final List<List<FocusNode>> focusNodes;
   // 項目データ
   late final List<RecordItem> recordItems;
 
@@ -46,50 +45,56 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
     return sum;
   }
 
-  Future<void> _saveScores() async {
-    // 変更がなければ保存しない。
-    if(hasChanges == false) return;
+  // 1マス分の得点を保存（値に変更がなければ保存しない）
+  Future<void> _saveScoreAt(int row, int col) async {
+    final scoreText = controllers[row][col].text.trim();
 
+    // 空欄は未入力(null)として保存
+    final int? score;
+    if (scoreText.isEmpty) {
+      score = null;
+    } else {
+      score = int.tryParse(scoreText);
+      if (score == null) return; // 数字でない場合は無視
+    }
+
+    // RecordItemを取得
+    final userId = players[col].id;
+    final scoringCategoryId = scoringCategories[row].id;
+    final recordItem = _recordItemBox.values.firstWhere(
+      (item) =>
+          item.recordId == widget.record.id &&
+          item.userId == userId &&
+          item.scoringCategoryId == scoringCategoryId
+    );
+
+    // 変更がなければ保存しない
+    if (recordItem.score == score) return;
+
+    recordItem.score = score;
+    recordItem.updatedAt = DateTime.now();
+
+    // 更新保存
+    await recordItem.save();
+
+    // firestoreへの保存（閲覧側へリアルタイム反映）
+    await FirebaseFirestore.instance
+        .collection('records')
+        .doc(widget.record.id)
+        .collection('recordItems')
+        .doc(recordItem.id)
+        .set(recordItem.toFirestoreMap());
+  }
+
+  // 全マスの得点を保存（画面離脱時などの保険）
+  Future<void> _saveScores({bool showMessage = false}) async {
     for (int row = 0; row < scoringCategories.length; row++) {
-      final scoringCategoryId = scoringCategories[row].id;
-
       for (int col = 0; col < players.length; col++) {
-        final userId = players[col].id;
-        final scoreText = controllers[row][col].text;
-
-        // 空欄はスキップ（または null を許容するなら続行）
-        if (scoreText.trim().isEmpty) continue;
-
-        final score = int.tryParse(scoreText);
-        if (score == null) continue; // 数字でない場合は無視
-
-        // RecordItemを取得
-        final recordItem = _recordItemBox.values.firstWhere(
-          (item) =>
-              item.recordId == widget.record.id &&
-              item.userId == userId &&
-              item.scoringCategoryId == scoringCategoryId
-        );
-
-        recordItem.score = score;
-        recordItem.updatedAt = DateTime.now();
-
-        // 更新保存
-        await recordItem.save();
-
-        // firestoreへの保存
-        await FirebaseFirestore.instance
-            .collection('records')
-            .doc(widget.record.id)
-            .collection('recordItems')
-            .doc(recordItem.id)
-            .set(recordItem.toFirestoreMap());
+        await _saveScoreAt(row, col);
       }
     }
 
-    // 変更有無の監視を初期化
-    hasChanges = false;
-
+    if (!showMessage) return;
     if (!mounted) return; // context を使う前に確認
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -122,10 +127,8 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
 
     // ダイアログで「削除」が押された場合のみ、削除処理を実行
     if (shouldDelete == true) {
-      // 項目削除
-      await _recordItemBox.deleteAll(recordItems.map((e) => e.key));
-      // 記録削除
-      await _recordBox.delete(widget.record.id);
+      // 記録・項目削除（端末とfirestore）
+      await recordService.deleteRecordWithItems(widget.record, recordItems);
 
       // 画面の存在確認（非同期処理の画面遷移対策）
       if (!mounted) return;
@@ -140,18 +143,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
   }
 
   Future<void> _createCopyRecord() async {
-    // 登録：記録
-    final record = await recordService.createRecordAndGet(boardGame);
-
-    // 登録：記録情報（ユーザー・得点項目）
-    var rowNumber = 0; // 項目の表示順
-    for (var player in players) {
-      for (var sc in scoringCategories) {
-        await recordService.createRecordItem(record, sc, player, rowNumber);
-        rowNumber++;
-      }
-      rowNumber = 0;
-    }
+    // 登録：記録・記録情報（ユーザー・得点項目）
+    final record = await recordService.createRecordWithItems(
+        boardGame, players, scoringCategories);
 
     if (!mounted) return; // context を使う前に確認
 
@@ -202,12 +196,20 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
           controller.text = item.score.toString();
         }
 
-        // 変更監視を追加
-        controller.addListener(() {
-          hasChanges = true;
-        });
-
         return controller;
+      }),
+    );
+    // カーソルが外れたら(blur)そのマスを保存
+    focusNodes = List.generate(
+      scoringCategories.length,
+      (row) => List.generate(players.length, (col) {
+        final focusNode = FocusNode();
+        focusNode.addListener(() {
+          if (!focusNode.hasFocus) {
+            _saveScoreAt(row, col);
+          }
+        });
+        return focusNode;
       }),
     );
   }
@@ -221,6 +223,12 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
     for (var row in controllers) {
       for (var ctrl in row) {
         ctrl.dispose();
+      }
+    }
+    // 得点入力フォーカス
+    for (var row in focusNodes) {
+      for (var node in row) {
+        node.dispose();
       }
     }
     super.dispose();
@@ -302,7 +310,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
                 leading: const Icon(Icons.save),
                 title: const Text('保存'),
                 onTap: () {
-                  _saveScores();
+                  _saveScores(showMessage: true);
                 },
               ),
               ListTile(
@@ -421,6 +429,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
                                 padding: const EdgeInsets.all(8.0),
                                 child: TextField(
                                   controller: controllers[row][col],
+                                  focusNode: focusNodes[row][col],
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
                                   decoration: const InputDecoration(
@@ -429,6 +438,9 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
                                     contentPadding: EdgeInsets.zero,
                                   ),
                                   onChanged: (_) => setState(() {}),
+                                  // マス外タップでカーソルを外す（blur → 保存）
+                                  onTapOutside: (_) =>
+                                      focusNodes[row][col].unfocus(),
                                 ),
                               ),
                           ],

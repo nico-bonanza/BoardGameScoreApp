@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:game_score_app/application/service/board_game_service.dart';
 import 'package:game_score_app/domain/models/board_game.dart';
 import 'package:game_score_app/domain/models/scoring_category.dart';
 import 'package:game_score_app/presentation/widgets/modals/board_game/update_modal.dart';
@@ -24,6 +25,7 @@ class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
   final scoringCategoryBox = Hive.box<ScoringCategory>('scoringCategories');
 
   late final ValueListenable<Box<BoardGame>> boardGameListenable;
+  final _boardGameService = BoardGameService();
 
   // 項目削除
     Future<void> _deleteCategory(ScoringCategory category) async {
@@ -51,9 +53,9 @@ class _BoardGameDetailScreenState extends State<BoardGameDetailScreen> {
 
     // ダイアログで「削除」が押された場合のみ、削除処理を実行
     if (shouldDelete == true) {
-      // 論理削除
+      // 論理削除（端末とfirestore）
       category.isDelete = true;
-      await category.save();
+      await _boardGameService.updateScoringCategory(category);
     }
   }
 
