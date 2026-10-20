@@ -22,7 +22,6 @@ class RecordDetailScreen extends StatefulWidget {
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBindingObserver {
   final _recordItemBox = Hive.box<RecordItem>('recordItems');
-  final _recordBox = Hive.box<Record>('records');
 
   final recordService = RecordService();
 
@@ -128,10 +127,8 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> with WidgetsBin
 
     // ダイアログで「削除」が押された場合のみ、削除処理を実行
     if (shouldDelete == true) {
-      // 項目削除
-      await _recordItemBox.deleteAll(recordItems.map((e) => e.key));
-      // 記録削除
-      await _recordBox.delete(widget.record.id);
+      // 記録・項目削除（端末とfirestore）
+      await recordService.deleteRecordWithItems(widget.record, recordItems);
 
       // 画面の存在確認（非同期処理の画面遷移対策）
       if (!mounted) return;

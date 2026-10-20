@@ -65,6 +65,24 @@ class RecordService {
     return record;
   }
 
+  // 削除：記録と記録情報をまとめて削除
+  // firestoreは親ドキュメントを消してもサブコレクションが残るため、recordItemsも個別に削除する
+  Future<void> deleteRecordWithItems(Record record, List<RecordItem> recordItems) async {
+    // 端末から削除
+    await _recordItemBox.deleteAll(recordItems.map((e) => e.key));
+    await _recordBox.delete(record.id);
+
+    // firestoreから削除（バッチ1件あたり最大500件）
+    final firestore = FirebaseFirestore.instance;
+    final recordRef = firestore.collection('records').doc(record.id);
+    final batch = firestore.batch();
+    for (var item in recordItems) {
+      batch.delete(recordRef.collection('recordItems').doc(item.id));
+    }
+    batch.delete(recordRef);
+    await batch.commit();
+  }
+
   // 記録IDから、設定された得点項目を取得
   List<ScoringCategory> getScoringCategoriesByRecordId(String recordId) {
     // recordId に紐づく RecordItem を rowNumber 昇順で取得

@@ -45,7 +45,7 @@ class _ScoringCategoryInputModelState extends State<ScoringCategoryInputModel> {
       else {
         existItem.isDelete = false;
         existItem.createdAt = DateTime.now();
-        await existItem.save();
+        await _service.updateScoringCategory(existItem); // 端末とfirestore
       }
     } else {
       // 新規保作成
